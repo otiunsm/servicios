@@ -86,7 +86,7 @@
 							</form>
 						</div>
 						<div class="fxt-footer">
-							<p>¿Tienes algún problema para acceder?<a href="https://wa.me/+51957298019" target="_blank" class="switcher-text2 inline-text">Contactar</a></p>
+							<p>¿Tienes algún problema para acceder?<a href="https://wa.me/+51917106190" target="_blank" class="switcher-text2 inline-text">Contactar</a></p>
 						</div>
 					</div>
 				</div>
