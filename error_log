@@ -1,0 +1,44 @@
+[20-Mar-2023 23:08:53 America/Lima] PHP Deprecated:  Optional parameter $view declared before required parameter $data is implicitly treated as a required parameter in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:19:43 America/Lima] PHP Deprecated:  Optional parameter $view declared before required parameter $data is implicitly treated as a required parameter in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:30:34 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:32:57 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:36:22 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:40:06 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[27-Mar-2023 11:42:59 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[01-May-2023 00:07:30 America/Lima] PHP Fatal error:  Cannot redeclare App\Controllers\Pdfreporte::reporte_boleta() in /home/servicios/public_html/app/Controllers/Pdfreporte.php on line 126
+[01-May-2023 00:07:40 America/Lima] PHP Fatal error:  Cannot redeclare App\Controllers\Pdfreporte::reporte_boleta() in /home/servicios/public_html/app/Controllers/Pdfreporte.php on line 126
+[01-May-2023 00:07:49 America/Lima] PHP Fatal error:  Cannot redeclare App\Controllers\Pdfreporte::reporte_boleta() in /home/servicios/public_html/app/Controllers/Pdfreporte.php on line 126
+[01-May-2023 00:08:12 America/Lima] PHP Fatal error:  Cannot redeclare App\Controllers\Pdfreporte::reporte_boleta() in /home/servicios/public_html/app/Controllers/Pdfreporte.php on line 126
+[01-May-2023 00:11:42 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[01-May-2023 00:14:49 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[01-May-2023 00:17:27 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 11:27:24 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 11:39:48 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 11:42:09 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 11:55:25 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:00:26 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:16:34 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:24:32 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:32:46 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:35:20 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:39:24 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:48:12 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:49:51 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:51:44 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[02-May-2023 12:56:02 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 12:41:22 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 12:52:32 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 12:57:31 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:03:38 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:10:59 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:15:20 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:18:02 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:22:17 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:24:30 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:33:46 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:35:52 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:39:40 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[11-Dec-2023 13:42:11 America/Lima] PHP Deprecated:  Required parameter $data follows optional parameter $view in /home/servicios/public_html/system/Controller.php on line 163
+[26-Aug-2024 22:39:17 America/Lima] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/servicios/public_html/app/Controllers/Apis.php on line 6
+[26-Aug-2024 22:39:42 America/Lima] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/servicios/public_html/app/Controllers/Apis.php on line 6
+[26-Aug-2024 22:40:38 America/Lima] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/servicios/public_html/app/Controllers/Apis.php on line 6

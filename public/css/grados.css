@@ -1,0 +1,81 @@
+  nav {
+                position: fixed;
+                background-color: #fff;
+                width: 20%;
+                padding: 20px;
+                text-align: center;
+                right: 0;
+            }
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            li {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            li button.btn-romboide {
+                display: block;
+                margin: 0 auto;
+                padding: 0;
+                width: 95%;
+                height: 50px;
+                position: relative;
+                overflow: hidden;
+                border: none;
+                outline: none;
+                background: #01cc66;
+                transform: skew(-30deg);
+                transition: all 0.3s ease;
+                text-align: left;
+            }
+
+            li button.btn-romboide:before {
+                content: "";
+                position: absolute;
+                top: -20px;
+                left: -20px;
+                bottom: -20px;
+                right: -20px;
+                background: rgba(0, 0, 0, 0.2);
+                transform: skew(20deg);
+                z-index: -1;
+            }
+
+            li button.btn-romboide i {
+                display: inline-block;
+                vertical-align: middle;
+                margin-right: 10px;
+                transform: skew(30deg);
+                color: #fff;
+                font-size: 20px;
+                line-height: 30px;
+            }
+
+            li button.btn-romboide span {
+                display: inline-block;
+                vertical-align: middle;
+                transform: skew(30deg);
+                color: #fff;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            /*for mobile phones and tablets (both)*/
+			@media only screen and (min-width: 320px) and (max-width: 767px) {
+			  nav {
+			    position: absolute !important;
+			    width: 100%;
+			  }
+			}
+
+			/* for mobile phones only*/
+			@media only screen and (min-width: 320px) and (max-width: 480px) {
+			  nav {
+			    position: absolute !important;
+			    width: 100%;
+			  }
+			}
