@@ -1,0 +1,149 @@
+-- Insertar datos en act_area
+INSERT INTO `act_area` (`nombre_area`, `descripcion`)
+VALUES 
+('INFRAESTRUCTURA TECNOLOGICA', 'Area encargada de reparacion y matenimiento de equipos'),
+('SEGURIDAD Y GESTION DE REDES', 'Area encargada de las infraestructuras tecnológicas'),
+('ADMINISTRACIONS DE SISTEMA DE INFORMACION','Area encargada de soporte sistema web');
+
+-- Insertar datos en act_categoria_actividad
+INSERT INTO `act_categoria_actividad` (`nombre_c`)
+VALUES 
+('Instalacion de software'),
+('Restablecimiento de contraseña'),
+('Creacion de cuenta ORCID'),
+('Apoyo mediante AnyDesk'),
+('Soporte Técnico');
+
+-- Insertar datos en act_dependencia
+INSERT INTO act_dependencia (nombre_dep, descripcion)
+VALUES
+( 'Docente', 'Descripción del docente'),
+( 'Administrativo', 'Descripción del administrativo'),
+( 'Estudiante', 'Descripción del estudiante'),
+( 'ÁREA ACADÉMICA DE DERECHO PRIVADO DEL DADCP', 'Descripción'),
+( 'ÁREA ACADÉMICA DE DERECHO PÚBLICO DEL DADCP', 'Descripción'),
+( 'AREA DE ALMACEN', 'Descripción'),
+( 'AREA DE ARCHIVOS DE TESORERÍA', 'Descripción'),
+( 'AREA DE PATRIMONIO', 'Descripción'),
+( 'BIENESTAR UNIVERSITARIO - RIOJA', 'Descripción'),
+( 'CENTRO ACADEMICO Y DE INVESTIGACION MIRAFLORES', 'Descripción'),
+( 'CENTRO DE BIODIVERSIDAD Y MUSEO', 'Descripción'),
+( 'CENTRO DE IDIOMAS', 'Descripción'),
+( 'CENTRO DE TECNOLOGÍAS DE INFORMACIÓN - RIOJA', 'Descripción'),
+( 'CENTRO EN TECNOLOGÍAS DE INFORMACIÓN', 'Descripción'),
+( 'CENTRO MÉDICO UNIVERSITARIO', 'Descripción'),
+( 'CENTRO PRE UNIVERSITARIO', 'Descripción'),
+( 'CENTRO PRE UNIVERSITARIO-MOYOBAMBA', 'Descripción'),
+( 'CENTRO PRE UNIVERSITARIO-RIOJA', 'Descripción'),
+( 'COMISIÓN DE AUTOEVALUACION Y ACREDITACION EPO', 'Descripción'),
+( 'COMISIÓN DE AUTOEVALUACION Y ACREDITACION FCS', 'Descripción'),
+( 'COMISIÓN DE AUTOEVALUACIÓN Y ACREDITACIÓN FDYCP', 'Descripción'),
+( 'COMISIÓN DE AUTOEVALUACION Y ACREDITACION FISI', 'Descripción'),
+( 'COMISIÓN DE CONCURSO DOCENTE 2022 II', 'Descripción'),
+( 'COMISIÓN DE DETERMINACIÓN DE BRECHA DOCENTE Y ACADÉMICA', 'Descripción'),
+( 'COMISIÓN DE ÉTICA Y PROCESOS DISCIPLINARIOS DE LA FDCP', 'Descripción'),
+( 'COMISIÓN DE EVALUACIÓN CURRICULAR FDYCP', 'Descripción'),
+( 'COMISION DE EVALUACION CURRICULAR FISI', 'Descripción'),
+( 'COMISION DE EVALUACION CURRICULAR FMH', 'Descripción'),
+( 'COMISION DE GESTION CURRICULAR FISI', 'Descripción'),
+('COMISIÓN DE HORARIO Y MATRICULA FISI', 'Descripción'),
+('COMISIÓN DE HORARIOS Y MATRICULA FDYCP', 'Descripción'),
+('COMISION DE INVENTARIO', 'Descripción'),
+('COMISIÓN DE PLANIFICACIÓN Y PRESUPUESTO FCS', 'Descripción'),
+('COMISIÓN DE PLANIFICACIÓN Y PRESUPUESTO FDYCP.', 'Descripción'),
+('COMISIÓN DE PLANIFICACIÓN Y PRESUPUESTO FISI', 'Descripción'),
+('COMISIÓN DE PRODUCCIÓN DE BIENES Y SERVICIO FISI', 'Descripción'),
+('COMISIÓN DE PRODUCCIÓN DE BIENES Y SERVICIOS FDYCP', 'Descripción'),
+('COMISIÓN DE RECEPCIÓN DE BIENES DE CAPITAL', 'Descripción');
+
+
+
+-- Insertar datos en act_estado
+INSERT INTO `act_estado` (`nombre`)
+VALUES 
+('Recibido'),
+('Pendiente'),
+('Completado');
+
+-- Insertar datos en act_medio_solicitud
+INSERT INTO `act_medio_solicitud` (`nombre_solicitud`, `descripcion`)
+VALUES 
+('Correo', 'Solicitud enviada por correo electrónico'),
+('Pedido Director OTI', 'Pedido designado a asistente'),
+('Teléfono', 'Solicitud realizada por llamada telefónica'),
+('SGD', 'NUMERO DE LA CARTA');
+
+
+-- Insertar datos en act_periodo
+INSERT INTO `act_periodo` (`fecha_inicio`, `fecha_fin`, `pe_estado`)
+VALUES 
+('2024-01-01', '2024-12-31', '1');
+
+-- Insertar datos en act_solicitante
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Juan Pérez', '12345678', 'juan.perez@mail.com', '987654321', 'Av. Principal 123', 'Docente', '1');
+
+-- Insertar datos en act_tipo_asistencia
+INSERT INTO `act_tipo_asistencia` (`nombre`)
+VALUES 
+('Remota'),
+('Presencial'),
+('OTI');
+
+
+
+
+-- Insertar datos en act_registro
+INSERT INTO `act_registro` 
+(`numero`, `nro_carta`, `fec_atencion`, `detalle_actividad`, `fec_registro`, `observacion`, `tipo_doc`, `id_dependencia`, `id_solicitante`, `idmedio_solicitud`, `id_tipo_asistencia`, `idcategoria_actividad`, `id_estado`, `id_periodo`, `id_usuario`)
+VALUES 
+('001', 'CARTA001', '2024-01-15', 'Revisión del sistema de redes', '2024-01-10', 'Todo correcto', 'Informe Técnico', 1, 1, 1, 1, 1, 1, 1, 11);
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Ana Martínez', '87654321', 'ana.martinez@mail.com', '912345678', 'Calle Secundaria 456', 'Coordinadora de Proyectos', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Carlos López', '23456789', 'carlos.lopez@mail.com', '987123456', 'Pasaje Los Pinos 789', 'Alumno', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('María Rodríguez', '34567890', 'maria.rodriguez@mail.com', '921234567', 'Av. Las Flores 321', 'Jefa de Tecnología', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Luis Fernández', '45678901', 'luis.fernandez@mail.com', '934567890', 'Calle Los Olivos 654', 'Alumno', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Sofía Gutiérrez', '56789012', 'sofia.gutierrez@mail.com', '945678123', 'Jr. La Paz 987', 'Alumno', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Fernando Ramírez', '67890123', 'fernando.ramirez@mail.com', '956789012', 'Av. El Sol 159', 'Supervisor de Redes', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Lucía Torres', '78901234', 'lucia.torres@mail.com', '967890123', 'Calle Las Palmeras 753', 'Alumno', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Diego Morales', '89012345', 'diego.morales@mail.com', '978901234', 'Jr. San Martín 246', 'Alumno', '1');
+
+INSERT INTO `act_solicitante` (`nombre_solicitante`, `dni_solicitante`, `email`, `telefono`, `direccion`, `cargo`, `estado`)
+VALUES 
+('Paula Díaz', '90123456', 'paula.diaz@mail.com', '989012345', 'Av. La Molina 369', 'Docente', '1');
+
+
+
+
+SELECT * FROM act_registro;
+
+DELETE FROM act_registro WHERE idregistro= 1;
+
+
+UPDATE act_registro
+SET nro_carta = 'CARTA001'
+WHERE idregistro = 16;

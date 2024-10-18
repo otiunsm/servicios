@@ -7,7 +7,7 @@ class UserModel extends Model{
 	protected $primaryKey       = 'id_usuario';
 	protected $useAutoIncrement = true;
 	protected $returnType       = 'array';
-	protected $allowedFields    = ['nombre', 'apellido','usuario','clave','estado','dni','telefono','idperfil_usuario','correo','direccion','estado_clave', 'fecha_clave'];
+	protected $allowedFields    = ['nombre', 'idarea','apellido','usuario','clave','estado','dni','telefono','idperfil_usuario','correo','direccion','estado_clave', 'fecha_clave'];
 	
 	protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
@@ -17,6 +17,7 @@ class UserModel extends Model{
 	public function getUsuarios(){
 		return $this->db->table('usuario u')
 		->join('perfil pe', 'u.idperfil_usuario=pe.id_perfil')
+		->join('act_area ar', 'u.idarea = ar.idarea') // Unión con la tabla 'area'
 		->where('u.estado','1')
 		->orderBy('id_usuario', 'DESC')
 		->get()->getResultArray();
@@ -28,6 +29,8 @@ class UserModel extends Model{
 		->where(['u.estado' => '1', 'u.id_usuario' => $id])
 		->get()->getResultArray();
 	}
+	
+	
 
 	public function session_valid($usuario,$clave){
 		return $this->db->table('usuario u')

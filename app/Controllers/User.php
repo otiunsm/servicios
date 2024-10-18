@@ -34,7 +34,7 @@ class User extends Controller{
             'label' => 'Clave',
             'rules' => $isUpdating ? 'permit_empty|min_length[6]' : 'required|min_length[6]',
             'errors' => [
-                'min_length' => 'La {field} debe contener m¨ªnimo 6 caracteres.',
+                'min_length' => 'La {field} debe contener mï¿½ï¿½nimo 6 caracteres.',
                 'required' => 'La {field} es obligatoria.',
             ],
         ],
@@ -91,6 +91,10 @@ class User extends Controller{
 
     return redirect()->to(base_url() . "/user");
 }
+
+
+
+
 
     public function formDataDeprecated(){
         $validation =  \Config\Services::validation();

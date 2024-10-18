@@ -48,12 +48,12 @@
                             <tr>
                                 <th class="text-center">Item</th>
                                 <th>N° Documento</th>
+                                <th>Area</th>
                                 <th>Usuario</th>
                                 <th>Nombre(s)</th>
                                 <th>Apellidos</th>
                                 <th>Perfil</th>
-                                <th>Celular</th>
-                              
+                                <th>Celular</th>          
                                 <th>Dirección</th>
                                 <th>Acciones</th>
                             </tr>
@@ -66,12 +66,12 @@
                                     <tr>
                                         <td class="text-center">'.($key+1).'</td>
                                         <td>'.$user['dni'].'</td>
+                                        <td>'.$user['nombre_area'].'</td>
                                         <td>'.$user['usuario'].'</td>
                                         <td>'.$user['nombre'].'</td>
                                         <td>'.$user['apellido'].'</td>
                                         <td>'.$user['nombreperfil'].'</td>
                                         <td>'.$user['telefono'].'</td>
-                                        
                                         <td>'.$user['direccion'].'</td>
                                         <td class="text-center">
                                             <div class="btn-group">
