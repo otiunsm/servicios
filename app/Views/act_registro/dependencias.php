@@ -1,5 +1,25 @@
 <!--begin::Content-->
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+
+
+<!-- alertas -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if(session()->getFlashdata('AlertShowN')): ?>
+            let alerta = <?= json_encode(session()->getFlashdata('AlertShowN')) ?>;
+            Swal.fire({
+                icon: alerta.Tipo,
+                title: alerta.Tipo === 'success' ? '¡Éxito!' : 'Error',
+                text: alerta.Mensaje,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: alerta.Tipo === 'success' ? '#28a745' : '#d33'
+            });
+        <?php endif; ?>
+    });
+</script>
+
+
+
     <!--begin::Subheader-->
     <div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
         <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">

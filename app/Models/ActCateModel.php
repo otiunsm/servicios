@@ -10,45 +10,38 @@ class ActCateModel extends Model
     protected $table                = 'act_categoria_actividad';
     protected $primaryKey           = 'idcategoria_actividad';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
     protected $returnType           = 'array';
-    protected $useSoftDeletes       = false;
-    protected $protectFields        = true;
-    protected $allowedFields        = ['nombre_c','estado_cate'];
+    protected $allowedFields        = ['nombre_c', 'estado_cate'];
 
-    public function valid_cate($id, $cateName) {
-        $builder = $this->db->table('act_categoria_actividad')
-                            ->where('nombre_c', $cateName)
-                            ->where('estado_cate', 1);
-        if ($id) {
-            $builder->where('idcategoria_actividad !=', $id);  // Excluir la categoría actual al actualizar
-        }
-        return $builder->get()->getResultArray();
-    }
-    
-        
-    public function getcates() {
-        return $this->db->table('act_categoria_actividad')
-            ->where('estado_cate', 1) // Solo dependencias activas
-            ->get()->getResultArray();
-    }
-
-    public function getcate($id) {
-        return $this->db->table('act_categoria_actividad')
-            ->where('estado_cate', 1)
-            ->where('idcategoria_actividad', $id)
-            ->get()->getRowArray();  // Obtener solo un registro
-    }
-
-    public function updateValidcate($id, $nombreCate) {
-        $builder = $this->db->table('act_categoria_actividad')
+    // Verificar si la categoría ya existe
+    public function categoria_exists($nombreCate, $id = null)
+    {
+        $builder = $this->db->table($this->table)
             ->where('estado_cate', 1)
             ->where('nombre_c', $nombreCate);
-
         if (!is_null($id)) {
-            $builder->where('idcategoria_actividad !=', $id); // Excluir la dependencia actual
+            $builder->where('idcategoria_actividad !=', $id);
         }
+        return $builder->countAllResults() > 0;
+    }
 
-        return $builder->get()->getResultArray();
+    // Obtener todas las categorías
+    public function getcategorias()
+    {
+        return $this->db->table($this->table)->get()->getResultArray();
+    }
+
+    // Obtener una categoría específica por ID
+    public function getcategoria($id)
+    {
+        return $this->db->table($this->table)->where('idcategoria_actividad', $id)->get()->getRowArray();
+    }
+
+    // Cambiar el estado de una categoría específica
+    public function toggleEstadoCategoria($idcategoria)
+    {
+        $categoria = $this->find($idcategoria);
+        $nuevoEstado = $categoria['estado_cate'] == 1 ? 0 : 1;
+        return $this->update($idcategoria, ['estado_cate' => $nuevoEstado]);
     }
 }

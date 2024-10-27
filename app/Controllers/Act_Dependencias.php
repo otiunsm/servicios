@@ -15,7 +15,7 @@ class Act_Dependencias extends Controller
     public function index() {
         $listarDependencias = $this->modDepen->getdepens();
         $scripts = [
-            'scripts'=>['js/act_dependencias.js?v=7.1.6','js/msj.js?v=7.1.6'],
+            'scripts'=>['js/act_dependencias.js?v=7.1.6','js/alertas.js?v=7.1.6'],
         ];
         $this->viewData("act_registro/dependencias", ["Dependencias" => $listarDependencias], $scripts); 
     }
@@ -52,7 +52,7 @@ class Act_Dependencias extends Controller
                     : ["Tipo" => 'error', "Mensaje" => "No se pudo registrar la dependencia."];
             }
 
-            session()->setFlashdata('AlertShow', $mensaje);
+            session()->setFlashdata('AlertShowN', $mensaje);
         } else {
             $errors = $validation->getErrors();
             session()->setFlashdata('AlertShowCode', $errors);
@@ -102,7 +102,7 @@ class Act_Dependencias extends Controller
             $mensaje = ["Tipo" => 'error', "Mensaje" => "ID de dependencia no válido."];
         }
 
-        session()->setFlashdata('AlertShow', $mensaje);
+        session()->setFlashdata('AlertShowN', $mensaje);
         return redirect()->to(base_url()."/Act_Dependencias");
     }
 }

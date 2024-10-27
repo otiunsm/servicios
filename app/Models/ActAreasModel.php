@@ -10,57 +10,35 @@ class ActAreasModel extends Model
     protected $table                = 'act_area';
     protected $primaryKey           = 'idarea';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
     protected $returnType           = 'array';
-    protected $useSoftDeletes       = false;
-    protected $protectFields        = true;
-    protected $allowedFields        = ['nombre_area', 'descripcion','tipo_estado','estado_area'];
+    protected $allowedFields        = ['nombre_area', 'descripcion', 'tipo_estado', 'estado_area'];
 
-    // Método para verificar si ya existe un área con el mismo nombre
     public function area_exists($nombreArea, $id = null)
     {
         $builder = $this->db->table($this->table)
-            ->where('estado_area', 1) // Solo áreas activas
+            ->where('estado_area', 1)
             ->where('nombre_area', $nombreArea);
-
         if (!is_null($id)) {
-            $builder->where('idarea !=', $id); // Excluir el área actual si se está actualizando
+            $builder->where('idarea !=', $id);
         }
-
-        return $builder->countAllResults() > 0; // Retorna true si ya existe el área
+        return $builder->countAllResults() > 0;
     }
 
-    // Método para obtener todas las áreas activas
     public function getareas()
     {
-        return $this->db->table($this->table)
-            ->where('estado_area', 1) // Solo áreas activas
-            ->get()->getResultArray();
+        return $this->db->table($this->table)->get()->getResultArray();
     }
 
-    // Método para obtener una área específica
     public function getarea($id)
     {
-        return $this->db->table($this->table)
-            ->where('estado_area', 1)
-            ->where('idarea', $id)
-            ->get()->getRowArray(); // Obtener solo un registro
+        return $this->db->table($this->table)->where('idarea', $id)->get()->getRowArray();
     }
 
-    // Validar si se puede actualizar un área con un nombre sin duplicarlo
-    public function updateValidArea($id, $nombreArea)
+    public function toggleEstadoArea($idarea)
     {
-        $builder = $this->db->table($this->table)
-            ->where('estado_area', 1)
-            ->where('nombre_area', $nombreArea);
-
-        if (!is_null($id)) {
-            $builder->where('idarea !=', $id); // Excluir el área actual al hacer la validación
-        }
-
-        return $builder->get()->getResultArray();
+        $area = $this->find($idarea);
+        $nuevoEstado = $area['estado_area'] == 1 ? 0 : 1;
+        return $this->update($idarea, ['estado_area' => $nuevoEstado]);
     }
-    
 }
-
-
+    

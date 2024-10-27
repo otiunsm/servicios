@@ -13,7 +13,7 @@ class Act_Registrar extends Controller
     {
         $listarRegistrar = $this->modRegistrar->getregistrar();
         $scripts = [
-            'scripts' => ['js/act_registrar.js?v=7.1.6', 'js/msj.js?v=7.1.6']
+            'scripts' => ['js/act_registrar.js?v=7.1.6', 'js/alertas.js?v=7.1.6']
         ];
         $this->viewData("act_registro/registrar", ["Act_Registrar" => $listarRegistrar], $scripts);
     }
@@ -80,7 +80,7 @@ class Act_Registrar extends Controller
                 : ["Tipo" => 'error', "Mensaje" => "No se pudo registrar la actividad."];
         }
 
-        session()->setFlashdata('AlertShow', $mensaje);
+        session()->setFlashdata('AlertShowN', $mensaje);
     } else {
         // Manejo de errores de validación
         $errors = $validation->getErrors();
@@ -137,7 +137,7 @@ public function eliminar($id)
     }
 
     // Almacenar el mensaje en la sesión para mostrarlo en la siguiente vista
-    session()->setFlashdata('AlertShow', $mensaje);
+    session()->setFlashdata('AlertShowN', $mensaje);
 
     // Redirigir al listado de registros
     return redirect()->to(base_url() . "/Act_registrar");
