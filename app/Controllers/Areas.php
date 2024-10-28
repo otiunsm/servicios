@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 
 class Areas extends Controller
 {
+    protected $modArea;
     public function __construct()
     {
         $this->modArea = new ActAreasModel();
@@ -41,8 +42,8 @@ class Areas extends Controller
     {
         $validation = \Config\Services::validation();
         $postData = $this->request->getPost();
-        $isUpdating = isset($postData['idarea']) && !empty($postData['idarea']);
-        $idarea = $isUpdating ? $postData['idarea'] : null;
+        $isUpdating = isset($postData['id_area']) && !empty($postData['id_area']);
+        $idarea = $isUpdating ? $postData['id_area'] : null;
 
         $validationRules = [
             'nombre_area' => 'required',
@@ -95,4 +96,10 @@ class Areas extends Controller
         session()->setFlashdata('AlertShowN', $mensaje);
         return redirect()->to('/Areas');
     }
+
+    public function listarareas()
+    {
+        $response = $this->modArea->selectareas();
+        return $this->response->setJSON($response);
+    } 
 }

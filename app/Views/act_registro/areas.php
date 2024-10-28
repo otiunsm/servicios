@@ -2,18 +2,18 @@
     <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
         <!-- ///alertar /// -->
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            <?php if(session()->getFlashdata('AlertShowN')): ?>
-            let alerta = <?= json_encode(session()->getFlashdata('AlertShowN')) ?>;
-            Swal.fire({
-                icon: alerta.Tipo,
-                title: alerta.Tipo === 'success' ? '¡Éxito!' : 'Error',
-                text: alerta.Mensaje,
-                confirmButtonText: 'Aceptar',
-                confirmButtonColor: alerta.Tipo === 'success' ? '#28a745' : '#d33'
+            document.addEventListener('DOMContentLoaded', function() {
+                <?php if (session()->getFlashdata('AlertShowN')): ?>
+                    let alerta = <?= json_encode(session()->getFlashdata('AlertShowN')) ?>;
+                    Swal.fire({
+                        icon: alerta.Tipo,
+                        title: alerta.Tipo === 'success' ? '¡Éxito!' : 'Error',
+                        text: alerta.Mensaje,
+                        confirmButtonText: 'Aceptar',
+                        confirmButtonColor: alerta.Tipo === 'success' ? '#28a745' : '#d33'
+                    });
+                <?php endif; ?>
             });
-            <?php endif; ?>
-        });
         </script>
 
 
@@ -35,7 +35,7 @@
                         <ul
                             class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url()?>" class="text-muted">Inicio</a>
+                                <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
                             </li>
                         </ul>
                         <!--end::Breadcrumb-->
@@ -65,10 +65,6 @@
                                 Nueva Área</button>
                         </div>
                     </div>
-
-
-
-
                     <div class="card-body">
                         <!--begin: Datatable-->
                         <table class="table table-separate table-checkable table-sm " id="kt_datatable">
@@ -84,42 +80,42 @@
                             </thead>
                             <tbody>
                                 <?php if (!empty($Areas)) {
-            foreach ($Areas as $key => $area) { ?>
-                                <tr>
-                                    <td><?= $area['idarea'] ?></td>
-                                    <td><?= $area['nombre_area'] ?></td>
-                                    <td><?= $area['descripcion'] ?></td>
-                                    <td><?= $area['tipo_estado'] ?></td>
-                                    <td>
-                                        <?= $area['estado_area'] == 1 ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>' ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm buttonAreaEdit"
-                                                onclick="editarArea(<?= $area['idarea'] ?>, '<?= $area['nombre_area'] ?>', '<?= $area['descripcion'] ?>', '<?= $area['tipo_estado'] ?>')"
-                                                title="Editar">
-                                                <i class="fas fa-edit text-success"></i>
-                                            </button>
+                                    foreach ($Areas as $key => $area) { ?>
+                                        <tr>
+                                            <td><?= $area['id_area'] ?></td>
+                                            <td><?= $area['nombre_area'] ?></td>
+                                            <td><?= $area['descripcion'] ?></td>
+                                            <td><?= $area['tipo_estado'] ?></td>
+                                            <td>
+                                                <?= $area['estado_a'] == 1 ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>' ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm buttonAreaEdit"
+                                                        onclick="editarArea(<?= $area['id_area'] ?>, '<?= $area['nombre_area'] ?>', '<?= $area['descripcion'] ?>', '<?= $area['tipo_estado'] ?>')"
+                                                        title="Editar">
+                                                        <i class="fas fa-edit text-success"></i>
+                                                    </button>
 
-                                            <!-- Botón de cambio de estado solo con ícono -->
-                                            <button class="btn btn-sm buttonToggleState"
-                                                itemButton="<?= $area['idarea'] ?>"
-                                                title="<?= $area['estado_area'] == 1 ? 'Desactivar' : 'Activar' ?>">
-                                                <i class="<?= $area['estado_area'] == 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off' ?>"
-                                                    style="font-size: 1.5rem;"></i>
-                                            </button>
+                                                    <!-- Botón de cambio de estado solo con ícono -->
+                                                    <button class="btn btn-sm buttonToggleState"
+                                                        itemButton="<?= $area['id_area'] ?>"
+                                                        title="<?= $area['estado_a'] == 1 ? 'Desactivar' : 'Activar' ?>">
+                                                        <i class="<?= $area['estado_a'] == 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off' ?>"
+                                                            style="font-size: 1.5rem;"></i>
+                                                    </button>
 
-                                            <!-- Agregar un evento al botón de eliminar -->
-                                            <button class="btn btn-sm buttonDelete" itemButton="<?= $area['idarea'] ?>"
-                                                title="Eliminar" onclick="eliminarArea(this)">
-                                                <i class="fas fa-trash text-danger"></i>
-                                            </button>
+                                                    <!-- Agregar un evento al botón de eliminar -->
+                                                    <button class="btn btn-sm buttonDelete" itemButton="<?= $area['id_area'] ?>"
+                                                        title="Eliminar" onclick="eliminarArea(this)">
+                                                        <i class="fas fa-trash text-danger"></i>
+                                                    </button>
 
-                                        </div>
-                                    </td>
-                                </tr>
+                                                </div>
+                                            </td>
+                                        </tr>
                                 <?php }
-        } ?>
+                                } ?>
                             </tbody>
 
                         </table>

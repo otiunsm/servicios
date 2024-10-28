@@ -64,4 +64,17 @@ class Act_solicitanteModel extends Model
             ->where(["u.estado" => '1', "u.usuario" => $solicitante])
             ->get()->getResultArray();
     }
+// agregado para listar solicitante.................................................................................
+    public function selectsolicitantes($nombre = null, $numDocumento = null) {
+        $builder = $this->db->table('act_solicitante')
+                            ->select('id_solicitante, nombre_so');
+            if ($nombre) {
+            $builder->like('nombre_so', $nombre);
+        }
+        if ($numDocumento) {
+            $builder->where('num_doc', $numDocumento);
+        }
+            return $builder->get()->getResultArray();
+    }
+    
 }

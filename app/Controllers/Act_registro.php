@@ -4,20 +4,28 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\Act_registroModel;
+use App\Models\Act_solicitanteModel;
+use App\Models\ActDepenModel;
+use App\Models\ActCateModel;
+
 
 class Act_registro extends Controller
 {
   protected $modAct; // se agreo esto
+  protected $modSolic;
+  protected $modDepen;
+  protected $catemodel;
   public function __construct()
   {
-    // $this->modSiaf = new ActreportesModel();
-    //  $this->modSiafData = new ActreportesModel();
     $this->modAct = new Act_registroModel();
+    $this->modSolic = new Act_solicitanteModel();
+    $this->modDepen = new ActDepenModel();
+    $this->catemodel = new ActCateModel();
   }
   public function index()
   {
     $listarActividad = $this->modAct->getRegistros();
-    $scripts = ['scripts' => ['js/form_act.js?v=7.1.6','js/msj.js?v=7.1.6','plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6']];
+    $scripts = ['scripts' => ['js/act_registrar.js?v=7.1.6', 'js/msj.js?v=7.1.6', 'plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6', '']];
 
     $this->viewData("act_registro/registrar", ["Act_registro" => $listarActividad], $scripts);
   }
@@ -107,12 +115,60 @@ class Act_registro extends Controller
 
   public function insert($data)
   {
-      if ($this->modAct->valid_registro(null, $data['act_registro'])) {
-          return false;
+    if ($this->modAct->valid_registro(null, $data['act_registro'])) {
+      return false;
+    }
+    $guardar = $this->modAct->insert($data);
+    $response = $guardar ? true : false;
+    return $response;
+  }
+  public function buscarSoli()
+  {
+    if ($this->request->isAjax()) {
+      $nombre = $this->request->getVar('nombre_so') ?? '';
+      $numDocumento = $this->request->getVar('num_doc') ?? '';
+      $solicitudes = $this->modSolic->selectsolicitantes($nombre, $numDocumento);
+      if (!empty($solicitudes)) {
+        return $this->response->setJSON([
+          'status' => 'success',
+          'data' => $solicitudes
+        ]);
+      } else {
+        return $this->response->setJSON([
+          'status' => 'error',
+          'message' => 'No se encontraron solicitantes que coincidan con los criterios.'
+        ]);
       }
-      $guardar = $this->modAct->insert($data);
-      $response = $guardar ? true : false;
-      return $response;
+    } else {
+      return redirect()->to(base_url() . "Act_registrar");
+    }
   }
 
+
+  public function listar_dependencias()
+  {
+    if ($this->request->isAjax()) {
+      $nombre = $this->request->getVar('nombre_dep') ?? '';
+      $dep = $this->modDepen->selectDepens($nombre);
+      if (!empty($dep)) {
+        return $this->response->setJSON([
+          'status' => 'success',
+          'data' => $dep
+        ]);
+      } else {
+        return $this->response->setJSON([
+          'status' => 'error',
+          'message' => 'No se encontraron solicitantes que coincidan con los criterios.'
+        ]);
+      }
+    } else {
+      return redirect()->to(base_url() . "Act_registrar");
+    }
+  }
+  //lisdtar dependencias
+  public function listarcategoiriaact()
+  {
+      $response = $this->catemodel->selectcategorias();
+      return $this->response->setJSON($response);
+  } 
 }

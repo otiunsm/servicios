@@ -180,6 +180,16 @@
                                 <p class="text-muted small">Mínimo 6 caracteres.</p>
                             </div>
                         </div>
+                        <!-- areas -->
+                        <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="exampleSelect1">Area <span class="text-danger">*</span></label>
+                                    <select class="form-control select_area" id="nombre_area" name="nombre_area">
+                                        <option selected disabled></option>
+                                        <!-- falta -->
+                                    </select>
+                                </div>
+                            </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -190,3 +200,5 @@
         </div>
     </div>
 </div>
+<!--agregado cdn jquery para el selct-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

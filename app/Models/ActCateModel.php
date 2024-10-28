@@ -44,4 +44,12 @@ class ActCateModel extends Model
         $nuevoEstado = $categoria['estado_cate'] == 1 ? 0 : 1;
         return $this->update($idcategoria, ['estado_cate' => $nuevoEstado]);
     }
+
+    // Obtener todas las categorías activas
+    public function selectcategorias()
+    {
+        return $this->db->table($this->table)
+            ->where('estado_cat', 1)
+            ->get()->getResultArray();
+    }   
 }

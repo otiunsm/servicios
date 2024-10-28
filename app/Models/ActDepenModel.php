@@ -49,4 +49,14 @@ class ActDepenModel extends Model
 
         return $builder->get()->getResultArray();
     }
+
+    //select dependencias nuevo *******
+    public function selectDepens($nombre = null) {
+        $builder = $this->db->table('act_dependencia')
+            ->select('id_dependencia, nombre_dep');
+        if ($nombre) {
+            $builder->like('nombre_dep', $nombre);
+        }
+        return $builder->get()->getResultArray();
+    }
 }

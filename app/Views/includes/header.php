@@ -21,6 +21,10 @@
 		<link href="<?= base_url()?>/css/themes/layout/header/menu/lightd1cf.css?v=7.1.6" rel="stylesheet" type="text/css" />
 		<link href="<?= base_url()?>/css/themes/layout/brand/darkd1cf.css?v=7.1.6" rel="stylesheet" type="text/css" />
 		<link href="<?= base_url()?>/css/themes/layout/aside/darkd1cf.css?v=7.1.6" rel="stylesheet" type="text/css" />
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-theme@0.1.0-beta.10/dist/select2-bootstrap.min.css" rel="stylesheet">
+
+
 		<!--end::Layout Themes-->
 		<link rel="shortcut icon" href="<?= base_url()?>/img/insignia.png" />
 	</head>
