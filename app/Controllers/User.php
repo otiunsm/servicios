@@ -88,6 +88,7 @@ class User extends Controller
     {
         $listUsers = $this->modUser->getUsuarios();
         $listPerfil = $this->modUser->get_perfiles();
+		$serverDatable  = true;
         $scripts = [
             'scripts' => ['plugins/custom/datatables/dtserverUser.js?v=7.1.6', 'js/form_consulta.js?v=7.1.6', 'js/form_user.js?v=7.1.6', 'plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6'],
         ];
