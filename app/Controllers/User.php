@@ -92,7 +92,7 @@ class User extends Controller
         $scripts = [
             'scripts' => ['plugins/custom/datatables/dtserverUser.js?v=7.1.6', 'js/form_consulta.js?v=7.1.6', 'js/form_user.js?v=7.1.6', 'plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6'],
         ];
-        $this->viewData('modulos/userview', ['Usuarios' => $listUsers, 'Perfiles' => $listPerfil], $scripts);
+        $this->viewData('modulos/userview', ['Usuarios' => $listUsers, 'Perfiles' => $listPerfil, 'serverDatable' => $serverDatable], $scripts);
     }
 
     public function formData()
