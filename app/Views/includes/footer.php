@@ -133,7 +133,11 @@
 					<script src="<?= base_url() ?>/js/scripts.bundled1cf.js?v=7.1.6"></script>
 					<script src="<?= base_url() ?>/js/pages/toastr.js?v=7.1.6"></script>
 					<script src="<?= base_url() ?>/plugins/custom/datatables/datatables.bundled1cf.js?v=7.1.6"></script>
-					<script src="<?= base_url() ?>/plugins/custom/datatables/paginationsd1cf.js?v=7.1.6"></script>
+					
+					<?php if (!isset($serverDatable) || $serverDatable !== true): ?>
+						<script src="<?= base_url() ?>/plugins/custom/datatables/paginationsd1cf.js?v=7.1.6"></script>
+					<?php endif; ?>
+
 					<script src="<?= base_url() ?>/js/pages/sweetalert2.js?v=7.1.6"></script>
 
 					<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
