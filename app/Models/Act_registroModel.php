@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use CodeIgniter\Model;
 
 class Act_registroModel extends Model
@@ -10,10 +9,8 @@ class Act_registroModel extends Model
     protected $table                = 'act_registro';
     protected $primaryKey           = 'idregistro';
     protected $useAutoIncrement     = true;
-    //protected $insertID             = 0;
     protected $returnType           = 'array';
-    //protected $useSoftDeletes       = false;
-    //protected $protectFields        = true;
+
     protected $allowedFields        = [
         'numero',
         'fec_doc_sgd',
@@ -21,15 +18,18 @@ class Act_registroModel extends Model
         'detalle_actividad',
         'fec_registro',
         'fec_atencion',
-        'observacion',
         'tipo_doc',
         'id_dependencia',
         'id_solicitante',
-        'id_medio_solicitud',
-        'id_tipo_asistencia',
+        'tipo_solicitud',
+        'tipo_asistencia',
+        'medio_solicitud',
         'id_categoria_actividad',
         'id_usuario',
-        'estado_r'
+        'estado_r',
+        'otras_atenciones',
+        'observacion',
+        'act_eliminar'
     ];
     // Dates
     protected $useTimestamps        = false;
@@ -39,56 +39,84 @@ class Act_registroModel extends Model
     protected $deletedField         = 'deleted_at';
 
 
-    public function getRegistros()
+    public function getRegistros($id, $idperfil)
+    {
+        $builder = $this->db->table('act_registro ar')
+            ->join('act_dependencia d', 'ar.id_dependencia = d.id_dependencia')
+            ->join('act_solicitante s', 'ar.id_solicitante = s.id_solicitante')
+            ->join('act_categoria_actividad ca', 'ar.id_categoria_actividad = ca.id_categoria_actividad')
+            ->join('usuario u', 'ar.id_usuario = u.id_usuario')
+            ->where('ar.act_eliminar', '1');
+        if ($idperfil != 1) {
+            $builder->where('ar.id_usuario', $id);
+        }
+
+        return $builder->orderBy('ar.idregistro', 'DESC')->get()->getResultArray();
+    }
+
+    public function getRegistroscopia($id, $idperfil, $fechainicio, $fechafin)
+    {
+        $builder = $this->db->table('act_registro ar')
+            ->join('act_dependencia d', 'ar.id_dependencia = d.id_dependencia')
+            ->join('act_solicitante s', 'ar.id_solicitante = s.id_solicitante')
+            ->join('act_categoria_actividad ca', 'ar.id_categoria_actividad = ca.id_categoria_actividad')
+            ->join('usuario u', 'ar.id_usuario = u.id_usuario')
+            ->where('ar.act_eliminar', '1'); 
+    
+        // Verificar si no es el perfil 1 y filtrar por usuario
+        if ($idperfil != 1) {
+            $builder->where('ar.id_usuario', $id);
+        }
+    
+        // Filtrar por fecha de inicio y fin si existen
+        if (!empty($fechainicio)) {
+            $builder->where('ar.fec_registro >=', $fechainicio);
+        }
+        if (!empty($fechafin)) {
+            $builder->where('ar.fec_registro <=', $fechafin);
+        }
+    
+        return $builder->orderBy('ar.idregistro', 'DESC')->get()->getResultArray();
+    }
+    
+
+    public function getRegistro($id)
     {
         return $this->db->table('act_registro ar')
             ->join('act_dependencia d', 'ar.id_dependencia = d.id_dependencia')
             ->join('act_solicitante s', 'ar.id_solicitante = s.id_solicitante')
-            ->join('act_medio_solicitud ms', 'ar.id_medio_solicitud = ms.id_medio_solicitud')
-            ->join('act_tipo_asistencia ta', 'ar.id_tipo_asistencia = ta.id_tipo_asistencia')
             ->join('act_categoria_actividad ca', 'ar.id_categoria_actividad = ca.id_categoria_actividad')
             ->join('usuario u', 'ar.id_usuario = u.id_usuario')
-            ->where('ar.estado_r', '1')  // Filtrar solo los registros activos
-            ->orderBy('ar.idregistro', 'DESC')
+            ->where(['ar.act_eliminar' => '1', 'ar.idregistro' => $id]) 
             ->get()->getResultArray();
     }
-
-    /*public function get_acts() {
-        return $this->db->table('act_registro a')
-            // JOIN con las tablas relacionadas
-            ->join('act_dependencia d', 'a.id_dependencia = d.id_dependencia')
-            ->join('act_solicitante s', 'a.id_solicitante = s.id_solicitante')
-            ->join('act_medio_solicitud ms', 'a.idmedio_solicitud = ms.idmedio_solicitud')
-            ->join('act_tipo_asistencia ta', 'a.id_tipo_asistencia = ta.id_tipo_asistencia')
-            ->join('act_categoria_actividad ca', 'a.idcategoria_actividad = ca.idcategoria_actividad')
-            ->join('usuario u', 'a.id_usuario = u.id_usuario') // left join para usuarios opcionales
-            //->select('a.*, d.nombre_dep, s.nombre_so, ms.nombre_solicitud, ta.nombre, ca.nombre_c,  u.nombre')
-            ->where('a.estado_r', '1')
-            ->orderBy('a.idregistro', 'DESC')
-            ->get()->getResultArray();
-    }*/
-    
-
-    public function getRegistro($id){
-        return $this->db->table('act_registro ar')
-            ->join('act_dependencia d', 'ar.id_dependencia = d.id_dependencia')
-            ->join('act_solicitante s', 'ar.id_solicitante = s.id_solicitante')
-            ->join('act_medio_solicitud ms', 'ar.id_medio_solicitud = ms.id_medio_solicitud')
-            ->join('act_tipo_asistencia ta', 'ar.id_tipo_asistencia = ta.id_tipo_asistencia')
-            ->join('act_categoria_actividad ca', 'ar.id_categoria_actividad = ca.id_categoria_actividad')
-            ->join('usuario u', 'ar.id_usuario = u.id_usuario')
-           // ->where('ar.idregistro', $id)  // Filtrar solo por ID del registro Si necesitas mostrar tanto registros activos como inactivos:
-            ->where(['ar.estado_r' => '1', 'ar.idregistro' => $id])  // Filtrar por estado activo y ID del registro
-            ->get()->getResultArray();
+    public function valid_registro($id, $registro)
+    {
+        $query = $this->db->table('act_registro')
+            ->where('detalle_actividad', $registro)
+            ->where('act_eliminar', 1);
+        if ($id != null) {
+            $query->where('idregistro!=', $id);
+        }
+        return $query->get()->getResultArray();
     }
-    public function valid_registro($id, $registro){
-		$query = $this->db->table('act_registro')
-		->where('detalle_actividad', $registro)
-		->where('estado', 1);
-		if ($id != null) {
-			$query->where('idregistro!=', $id);
-		}
-		return $query->get()->getResultArray();
-	}
-    
+
+    // Función para actualizar el estado de un registro
+    public function actualizarEstado($idregistro, $nuevoEstado)
+    {
+        $builder = $this->db->table('act_registro');
+        $builder->where('idregistro', $idregistro);
+        $builder->set('act_eliminar', $nuevoEstado);
+        $resultado = $builder->update();
+        return $resultado;
+    }
+
+ public function estadoActual($idregistro,$estadoactual)
+    {
+        $builder = $this->db->table('act_registro');
+        $builder->where('idregistro', $idregistro,);
+        $builder->set('estado_r', $estadoactual);
+        $resultado = $builder->update();
+        return $resultado;
+    }
 }

@@ -30,7 +30,6 @@ class UserModel extends Model{
 		->get()->getResultArray();
 	}
 	
-	
 
 	public function session_valid($usuario,$clave){
 		return $this->db->table('usuario u')
@@ -77,7 +76,7 @@ class UserModel extends Model{
 		if ($id != null) {
 			$query->where('id_usuario!=', $id);
 		}
-		return $query->get()->getResultArray();
+		return $query->get()->getResultArray();		
 	}
 
 

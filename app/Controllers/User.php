@@ -100,10 +100,6 @@ class User extends Controller
         return redirect()->to(base_url() . "/user");
     }
 
-
-
-
-
     public function formDataDeprecated()
     {
         $validation =  \Config\Services::validation();

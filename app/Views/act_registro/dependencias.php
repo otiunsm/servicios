@@ -2,21 +2,21 @@
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 
 
-<!-- alertas -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        <?php if(session()->getFlashdata('AlertShowN')): ?>
-            let alerta = <?= json_encode(session()->getFlashdata('AlertShowN')) ?>;
-            Swal.fire({
-                icon: alerta.Tipo,
-                title: alerta.Tipo === 'success' ? '¡Éxito!' : 'Error',
-                text: alerta.Mensaje,
-                confirmButtonText: 'Aceptar',
-                confirmButtonColor: alerta.Tipo === 'success' ? '#28a745' : '#d33'
-            });
-        <?php endif; ?>
-    });
-</script>
+    <!-- alertas -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (session()->getFlashdata('AlertShowN')): ?>
+                let alerta = <?= json_encode(session()->getFlashdata('AlertShowN')) ?>;
+                Swal.fire({
+                    icon: alerta.Tipo,
+                    title: alerta.Tipo === 'success' ? '¡Éxito!' : 'Error',
+                    text: alerta.Mensaje,
+                    confirmButtonText: 'Aceptar',
+                    confirmButtonColor: alerta.Tipo === 'success' ? '#28a745' : '#d33'
+                });
+            <?php endif; ?>
+        });
+    </script>
 
 
 
@@ -33,7 +33,7 @@
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
                         <li class="breadcrumb-item">
-                            <a href="<?= base_url()?>" class="text-muted">Inicio</a>
+                            <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
                         </li>
                     </ul>
                     <!--end::Breadcrumb-->
@@ -61,7 +61,7 @@
                     <div class="card-toolbar">
                         <div class="dropdown dropdown-inline mr-2">
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                data-target="#formDepen"><i class="fas fa-user-plus" onclick="resetForm()" ></i> Nueva Dependencia</button>
+                                data-target="#formDepen"><i class="fas fa-user-plus" onclick="resetForm()"></i> Nueva Dependencia</button>
                         </div>
                     </div>
                 </div>
@@ -78,29 +78,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-        if (!empty($Dependencias)) {
-            foreach ($Dependencias as $dependencia) {
-                echo '
+                            <?php
+                            if (!empty($Dependencias)) {
+                                foreach ($Dependencias as $dependencia) {
+                                    echo '
                 <tr>
-                    <td>'.$dependencia['id_dependencia'].'</td>
-                    <td>'.$dependencia['nombre_dep'].'</td>
-                    <td>'.$dependencia['descripcion'].'</td>
+                    <td>' . $dependencia['id_dependencia'] . '</td>
+                    <td>' . $dependencia['nombre_dep'] . '</td>
+                    <td>' . $dependencia['descripcion'] . '</td>
                     <td>';
-                echo $dependencia['estado_depen'] == 1 
-                    ? '<span class="badge badge-success">Activo</span>' 
-                    : '<span class="badge badge-danger">Inactivo</span>';
-                echo '</td>
+                                    echo $dependencia['estado_dep'] == 1
+                                        ? '<span class="badge badge-success">Activo</span>'
+                                        : '<span class="badge badge-danger">Inactivo</span>';
+                                    echo '</td>
                     <td class="text-center">
                         <div class="btn-group">
-                            <button class="btn btn-sm buttonDepenEdit" itemButton="'.$dependencia['id_dependencia'].'"><i class="fa fa-edit text-success"></i></button>
-                            <button class="btn btn-sm buttonDelete" itemButton="'.$dependencia['id_dependencia'].'"><i class="fas fa-times text-danger"></i></button>
+                            <button class="btn btn-sm buttonDepenEdit" itemButton="' . $dependencia['id_dependencia'] . '"><i class="fa fa-edit text-success"></i></button>
+                            <button class="btn btn-sm buttonDelete" itemButton="' . $dependencia['id_dependencia'] . '"><i class="fas fa-times text-danger"></i></button>
                         </div>
                     </td>
                 </tr>';
-            }
-        }
-        ?>
+                                }
+                            }
+                            ?>
                         </tbody>
                     </table>
                     <!--end: Datatable-->
@@ -125,7 +125,7 @@
                     <i aria-hidden="true" class="ki ki-close"></i>
                 </button>
             </div>
-            <form method="POST" action="<?= base_url('/Act_Dependencias/guardar') ?>"  id="form_depen">
+            <form method="POST" action="<?= base_url('/Act_Dependencias/guardar') ?>" id="form_depen">
                 <input type="hidden" name="id_dependencia" /> <!-- Campo oculto para el ID de la dependencia -->
                 <div class="modal-body">
                     <div class="row">

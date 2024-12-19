@@ -94,7 +94,7 @@ class Act_Dependencias extends Controller
 
     public function eliminar($id) {
         if (!empty($id)) {
-            $guardar = $this->modDepen->update($id, ['estado_depen' => '0']);
+            $guardar = $this->modDepen->update($id, ['estado_dep' => '0']);
             $mensaje = $guardar 
                 ? ["Tipo" => 'success', "Mensaje" => "Dependencia eliminada correctamente."] 
                 : ["Tipo" => 'error', "Mensaje" => "No se pudo eliminar la dependencia."];

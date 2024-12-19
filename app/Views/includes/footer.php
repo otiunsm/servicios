@@ -135,8 +135,9 @@
 					<script src="<?= base_url() ?>/plugins/custom/datatables/datatables.bundled1cf.js?v=7.1.6"></script>
 					<script src="<?= base_url() ?>/plugins/custom/datatables/paginationsd1cf.js?v=7.1.6"></script>
 					<script src="<?= base_url() ?>/js/pages/sweetalert2.js?v=7.1.6"></script>
+					<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> <!--agregado cdn jquery para el selct-->
 
-					<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+					
 
 					<!--end::Global Theme Bundle-->
 

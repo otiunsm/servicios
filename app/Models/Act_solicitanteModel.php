@@ -10,7 +10,7 @@ class Act_solicitanteModel extends Model
     protected $table                = 'act_solicitante';
     protected $primaryKey           = 'id_solicitante';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
+   // protected $insertID             = 0;
     protected $returnType           = 'array';
     //protected $useSoftDeletes       = false;
    // protected $protectFields        = true;
@@ -20,7 +20,7 @@ class Act_solicitanteModel extends Model
     protected $dateFormat           = 'datetime';
     protected $createdField         = 'created_at';
     protected $updatedField         = 'updated_at';
-    //protected $deletedField         = 'deleted_at';
+    protected $deletedField         = 'deleted_at';
 
     public function getSolicitantes() {
         return $this->db->table('act_solicitante s')   
@@ -44,8 +44,6 @@ class Act_solicitanteModel extends Model
             ->get()->getResultArray();
     }
 
-   
-
     public function valid_soli($id, $solicitante)
     {
         $query = $this->db->table('act_solicitante')
@@ -57,6 +55,8 @@ class Act_solicitanteModel extends Model
         return $query->get()->getResultArray();
     }
 
+    
+
     public function soli_exists($solicitante)
     {
         return $this->db->table('usuario u')
@@ -65,7 +65,7 @@ class Act_solicitanteModel extends Model
             ->get()->getResultArray();
     }
 // agregado para listar solicitante.................................................................................
-    public function selectsolicitantes($nombre = null, $numDocumento = null) {
+   public function selectsolicitantes($nombre = null, $numDocumento = null) {
         $builder = $this->db->table('act_solicitante')
                             ->select('id_solicitante, nombre_so');
             if ($nombre) {
@@ -75,6 +75,7 @@ class Act_solicitanteModel extends Model
             $builder->where('num_doc', $numDocumento);
         }
             return $builder->get()->getResultArray();
-    }
+    } 
+
     
 }

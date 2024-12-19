@@ -47,7 +47,7 @@
                                     <div class="col-lg-6">
                                         <div class="col-12" >
                                             <label for="typeDoc" class="form-label">* Seleccionar Tipo de Documento:</label>
-                                            <select id="typeDoc" class="form-control" name="typeDoc" />
+                                            <select id="typeDoc" class="form-control" name="typeDoc" >
                                             <option value="1">Carnet de Identificación Policial</option> 
                                             <option value="2">DNI</option> 
                                             <option value="3">Carnet de Extranjería</option> 

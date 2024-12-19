@@ -14,7 +14,7 @@ class ActDepenModel extends Model
     protected $returnType           = 'array';
     protected $useSoftDeletes       = false;
     protected $protectFields        = true;
-    protected $allowedFields        = ['nombre_dep', 'descripcion', 'estado_depen'];
+    protected $allowedFields        = ['nombre_dep', 'descripcion', 'estado_dep'];
 
     //valiacion///
 
@@ -27,20 +27,20 @@ class ActDepenModel extends Model
     ///
     public function getdepens() {
         return $this->db->table('act_dependencia')
-            ->where('estado_depen', 1) // Solo dependencias activas
+            ->where('estado_dep', 1) // Solo dependencias activas
             ->get()->getResultArray();
     }
 
     public function getdepen($id) {
         return $this->db->table('act_dependencia')
-            ->where('estado_depen', 1)
+            ->where('estado_dep', 1)
             ->where('id_dependencia', $id)
             ->get()->getRowArray();  // Obtener solo un registro
     }
 
     public function updateValidDepen($id, $nombreDepen) {
         $builder = $this->db->table('act_dependencia')
-            ->where('estado_depen', 1)
+            ->where('estado_dep', 1)
             ->where('nombre_dep', $nombreDepen);
 
         if (!is_null($id)) {

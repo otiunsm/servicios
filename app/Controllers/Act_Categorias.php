@@ -37,7 +37,7 @@ class Act_Categorias extends Controller
     public function guardar() {
         $validation = \Config\Services::validation();
         $postData = $this->request->getPost();
-        $isUpdating = isset($postData['idcategoria_actividad']) && !empty($postData['idcategoria_actividad']);
+        $isUpdating = isset($postData['id_categoria_actividad']) && !empty($postData['id_categoria_actividad']);
 
         $validationRules = [
             'nombre_c' => 'required', // Agregar reglas de validación
@@ -50,13 +50,13 @@ class Act_Categorias extends Controller
                 'nombre_c' => $postData['nombre_c'],
             ];
 
-            if ($this->modCate->categoria_exists($data['nombre_c'], $isUpdating ? $postData['idcategoria_actividad'] : null)) {
+            if ($this->modCate->categoria_exists($data['nombre_c'], $isUpdating ? $postData['id_categoria_actividad'] : null)) {
                 session()->setFlashdata('AlertShowN', ["Tipo" => 'error', "Mensaje" => "El nombre de la categoría ya existe."]);
                 return redirect()->back()->withInput();
             }
 
             if ($isUpdating) {
-                $response = $this->modCate->update($postData['idcategoria_actividad'], $data);
+                $response = $this->modCate->update($postData['id_categoria_actividad'], $data);
                 $mensaje = $response ? ["Tipo" => 'success', "Mensaje" => "Categoría actualizada."] : ["Tipo" => 'error', "Mensaje" => "No se pudo actualizar."];
             } else {
                 $response = $this->modCate->insert($data);

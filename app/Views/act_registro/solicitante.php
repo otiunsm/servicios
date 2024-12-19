@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-toolbar">
                         <div class="dropdown dropdown-inline mr-2">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#formSoli"><i class="fas fa-user-plus"></i> Nuevo Solicitante</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="agregarSolicitante()"> <i class="fas fa-user-plus"></i> Nuevo Solicitante</button>
                         </div>
                     </div>
                 </div>
@@ -92,75 +92,8 @@
 <!--end::Content-->
 
 <!-- Modal-->
-<div class="modal fade" id="formSoli" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdrop" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content" id="kt_login2">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Formulario de Solicitante</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i aria-hidden="true" class="ki ki-close"></i>
-                </button>
-            </div>
-            <form method="POST" action="Act_solicitante/formData" id="form_solicitante">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>DNI <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="dni_so" name="dni_so" placeholder="DNI" />
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-success btn-flat" onclick="buscarDni()">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Nombres y Apellidos <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nombre_so" name="nombre_so" placeholder="Ingrese el nombre"
-                                    onfocus="this.placeholder=''" />
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Dirección</label>
-                                <input type="text" class="form-control" id="direccion_so" name="direccion_so" placeholder="Ingrese la dirección" />
-                            </div>
-                        </div>
+<?php echo view('act_registro/ModalSoli'); ?>
 
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Correo</label>
-                                <input type="text" class="form-control" name="email_so" placeholder="Email" />
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Telefono</label>
-                                <input type="text" class="form-control" name="telefono_so" placeholder="Ingrese número de celular" />
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Cargo</label>
-                                <input type="text" class="form-control" name="cargo_so" placeholder="Ingrese la dirección" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" id="submitButton2" class="btn btn-success font-weight-bold">Guardar</button>
-                    <button type="button" class="btn btn-light-danger font-weight-bold" data-dismiss="modal">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <script>
     function buscarDni() {
         const dni = $("#dni_so").val(); // Obtener el valor del campo DNI
@@ -202,39 +135,3 @@
     }
 </script>
 
-<!--consumo de ampis-->
-
-
-<!--<script>
-    function buscarDni() {
-        // Obtener el DNI ingresado por el usuario
-        const dni = document.getElementById("dni_so").value;
-
-        // Validar que se haya ingresado el DNI
-        if (dni === "") {
-            alert("Por favor, ingrese un DNI.");
-            return;
-        }
-
-        // Hacer la solicitud a la API de RENIEC
-        fetch(`https://soporte.unsm.edu.pe/wsdl/wsdl_reniec.php?dni=${dni}`)
-            .then(response => response.json())
-            .then(data => {
-                // Verificar si los datos fueron encontrados
-                if (data.apPrimer && data.prenombres) {
-                    // Concatenar nombres y apellidos
-                    const nombresYApellidos = `${data.prenombres} ${data.apPrimer} ${data.apSegundo}`;
-
-                    // Asignar los valores a los campos correspondientes
-                    document.getElementById("nombre_so").value = nombresYApellidos;
-                    document.getElementById("direccion_so").value = data.direccion;
-                } else {
-                    alert("No se encontraron datos para el DNI ingresado.");
-                }
-            })
-            .catch(error => {
-                console.error("Error al consultar el DNI:", error);
-                alert("Hubo un error al consultar el DNI. Por favor, inténtelo nuevamente.");
-            });
-    }
-</script>-->

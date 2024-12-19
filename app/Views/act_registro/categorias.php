@@ -46,7 +46,7 @@
                     </div>
                     <div class="card-toolbar">
                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#formCate"
-                            onclick="limpiarFormulario()"><i class="fas fa-user-plus"></i> Nueva Categoría</button>
+                            onclick="limpiarFormulario()"><i class="fas fa-building"></i> Nueva Categoría</button>
                     </div>
                 </div>
 
@@ -65,35 +65,35 @@
                             <?php if (!empty($Categorias)) {
         foreach ($Categorias as $key => $categoria) { ?>
                             <tr>
-                                <td><?= $categoria['idcategoria_actividad'] ?></td>
+                                <td><?= $categoria['id_categoria_actividad'] ?></td>
                                 <td><?= $categoria['nombre_c'] ?></td>
                                 <td>
-                                    <?= $categoria['estado_cate'] == 1 ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>' ?>
+                                    <?= $categoria['estado_cat'] == 1 ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>' ?>
                                 </td>
 
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <!-- Botón Editar con clase y atributos correctos -->
                                         <button class="btn btn-sm buttonCateEdit"
-                                            itemButton="<?= $categoria['idcategoria_actividad'] ?>"
-                                            onclick="editarCate(<?= $categoria['idcategoria_actividad'] ?>, '<?= $categoria['nombre_c'] ?>')"
+                                            itemButton="<?= $categoria['id_categoria_actividad'] ?>"
+                                            onclick="editarCate(<?= $categoria['id_categoria_actividad'] ?>, '<?= $categoria['nombre_c'] ?>')"
                                             title="Editar">
                                             <i class="fas fa-edit text-success"></i>
                                         </button>
 
                                         <!-- Botón para cambiar el estado con clase y atributos correctos -->
                                         <button class="btn btn-sm buttonToggleStateCate"
-                                            itemButton="<?= $categoria['idcategoria_actividad'] ?>"
-                                            title="<?= $categoria['estado_cate'] == 1 ? 'Desactivar' : 'Activar' ?>">
-                                            <i class="<?= $categoria['estado_cate'] == 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off' ?>"
+                                            itemButton="<?= $categoria['id_categoria_actividad'] ?>"
+                                            title="<?= $categoria['estado_cat'] == 1 ? 'Desactivar' : 'Activar' ?>">
+                                            <i class="<?= $categoria['estado_cat'] == 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off' ?>"
                                                 style="font-size: 1.5rem;"></i>
                                         </button>
 
-                                        <!-- Botón Eliminar con clase y atributos correctos -->
+                                        <!-- Botón Eliminar con clase y atributos correctos
                                         <button class="btn btn-sm buttonDeleteCate"
-                                            itemButton="<?= $categoria['idcategoria_actividad'] ?>" title="Eliminar">
+                                            itemButton="<?= $categoria['id_categoria_actividad'] ?>" title="Eliminar">
                                             <i class="fas fa-trash text-danger"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </td>
                             </tr>
@@ -122,7 +122,7 @@
                 </button>
             </div>
             <form method="POST" action="/Act_Categorias/guardar" id="form_cate">
-                <input type="hidden" name="idcategoria_actividad" id="idcategoria_actividad" value="">
+                <input type="hidden" name="id_categoria_actividad" id="id_categoria_actividad" value="">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Nombre de la Categoría <span class="text-danger">*</span></label>

@@ -6,9 +6,12 @@ use CodeIgniter\Controller;
 use App\Controllers\Apis;
 use Mpdf\QrCode\QrCode;
 use Mpdf\QrCode\Output;
-require_once APPPATH . 'Libraries/vendor/autoload.php';
-// require_once APPPATH . 'Libraries/vendor2/autoload.php';
 
+
+//require_once APPPATH . 'Libraries/vendor/autoload.php';           //se comento esto
+// require_once APPPATH . 'Libraries/vendor2/autoload.php'; 
+
+require_once ROOTPATH . 'vendor/autoload.php';
 /**
  * Funciones para la generacion de pdf's de los distintos modulos
  */

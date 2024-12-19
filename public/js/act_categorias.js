@@ -56,11 +56,19 @@ $(document).on('click', '.buttonDeleteCate', function () {
     AlertSw(itemButton);  // Llamar a la función de alerta de confirmación
 });
 
-// Limpiar formulario de Categoría
+//limpiar formulario//
 function limpiarFormularioCate() {
-    document.getElementById('idcategoria_actividad').value = '';  // Limpia el campo oculto para crear un nuevo registro
-    document.getElementById('nombre_c').value = '';
-    document.getElementById('submitButton').textContent = 'Guardar';  // Cambia el botón a "Guardar"
+    const campos = ['id_categoria_actividad','nombre_c'];
+    campos.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.value = ''; // Limpia el valor del campo
+        }
+    });
+    const boton = document.getElementById('submitButton');
+    if (boton) {
+        boton.textContent = 'Guardar'; // Cambia el texto del botón
+    }
 }
 
 // Llama correctamente a los datos cuando se abre el modal de editar Categoría

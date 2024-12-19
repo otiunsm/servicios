@@ -55,7 +55,7 @@
                                         </div>
                                         <div class="col-12" >
                                             <label for="mes_tesoreria" class="form-label">Seleccionar mes:</label>
-                                            <select id="mes_tesoreria" class="form-control" name="mes_tesoreria" />
+                                            <select id="mes_tesoreria" class="form-control" name="mes_tesoreria" >
                                             <option value="todos" selected>Todos</option> 
                                             <option value="01">Enero</option> 
                                             <option value="02">Febrero</option> 
