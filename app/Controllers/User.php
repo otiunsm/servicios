@@ -5,8 +5,11 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Models\UserModel;
 use App\Models\ActAreasModel;
+use CodeIgniter\API\ResponseTrait;
 
 class User extends Controller
+
+	 use ResponseTrait;
 {
     protected $modUser;
     protected $modArea;
@@ -15,15 +18,81 @@ class User extends Controller
         $this->modUser = new UserModel();
         $this->modArea = new ActAreasModel();
     }
+	
+	    public function listar()
+    {
+        $draw = (int) $this->request->getVar('draw', FILTER_VALIDATE_INT) ?? 0;
+        $length = (int) $this->request->getVar('length', FILTER_VALIDATE_INT) ?? 10;
+        $start = (int) $this->request->getVar('start', FILTER_VALIDATE_INT) ?? 0;
+
+        $order = $this->parseOrder(
+            $this->request->getVar('order') ?? []
+        );
+
+        $search = $this->request->getVar('search')['value'] ?? '';
+		
+        $page = $this->calculatePage($start, $length);
+
+        $query = $this->modUser
+            ->table('usuario')
+            ->select('usuario.*, perfil.nombreperfil')
+            ->join('perfil', 'usuario.idperfil_usuario = perfil.id_perfil')
+            ->where('usuario.estado', '1')
+            ->orderBy($this->getColumn($order['column']), $order['dir']);
+
+
+        if (!empty($search)) {
+            $query->groupStart();
+            foreach (['usuario.nombre', 'usuario.apellido', 'usuario.usuario', 'perfil.nombreperfil'] as $column) {
+                $query->orLike($column, $search);
+            }
+            $query->groupEnd();
+        }
+
+        $data = $query->paginate($length, 'gp1', $page);
+
+        $response = [
+            'draw' => $draw,
+            'recordsTotal' => null,
+            'recordsFiltered' => $this->modUser->pager->getTotal('gp1'),
+            'data' => $data
+        ];
+
+        return $this->respond($response);
+    }
+
+    private function parseOrder(array $order): array
+    {
+        if (!empty($order) && isset($order[0])) {
+            return [
+                'column' => $order[0]['column'] ?? 0,
+                'dir' => $order[0]['dir'] ?? 'asc'
+            ];
+        }
+
+        return ['column' => 0, 'dir' => 'asc'];
+    }
+
+    private function calculatePage(int $start, int $length): int
+    {
+        return max(1, (int) ceil(($start + 1) / $length));
+    }
+
+    private function getColumn(int $index): string
+    {
+        $columns = ['id_usuario', 'nombre', 'apellido', 'usuario', 'dni', 'telefono', 'idperfil_usuario'];
+        return $columns[$index] ?? $columns[0];
+    }
 
     public function index()
     {
         $listUsers = $this->modUser->getUsuarios();
         $listPerfil = $this->modUser->get_perfiles();
+		$serverDatable  = true;
         $scripts = [
-            'scripts' => ['js/form_consulta.js?v=7.1.6', 'js/form_user.js?v=7.1.6', 'plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6'],
+            'scripts' => ['plugins/custom/datatables/dtserverUser.js?v=7.1.6', 'js/form_consulta.js?v=7.1.6', 'js/form_user.js?v=7.1.6', 'plugins/custom/qrcode/jquery.classyqr.js?v=7.1.6'],
         ];
-        $this->viewData('modulos/userview', ['Usuarios' => $listUsers, 'Perfiles' => $listPerfil], $scripts);
+        $this->viewData('modulos/userview', ['Usuarios' => $listUsers, 'Perfiles' => $listPerfil, 'serverDatable' => $serverDatable], $scripts);
     }
 
     public function formData()

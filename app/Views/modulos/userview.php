@@ -41,50 +41,24 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+             <div class="card-body table-responsive">
                     <!--begin: Datatable-->
-                    <table class="table table-separate table-head-custom table-checkable table-sm" id="kt_datatable">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Item</th>
-                                <th>N° Documento</th>
-                                <th>Area</th>
-                                <th>Usuario</th>
-                                <th>Nombre(s)</th>
-                                <th>Apellidos</th>
-                                <th>Perfil</th>
-                                <th>Celular</th>          
-                                <th>Dirección</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php 
-                            if ($Usuarios) {
-                                foreach ($Usuarios as $key => $user) {
-                                    echo '
-                                    <tr>
-                                        <td class="text-center">'.($key+1).'</td>
-                                        <td>'.$user['dni'].'</td>
-                                        <td>'.$user['nombre_area'].'</td>
-                                        <td>'.$user['usuario'].'</td>
-                                        <td>'.$user['nombre'].'</td>
-                                        <td>'.$user['apellido'].'</td>
-                                        <td>'.$user['nombreperfil'].'</td>
-                                        <td>'.$user['telefono'].'</td>
-                                        <td>'.$user['direccion'].'</td>
-                                        <td class="text-center">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm" id="buttonUserEdit" itemButton="'.$user['id_usuario'].'"><i class="fa fa-user-edit text-success"></i></button>
-                                                <button class="btn btn-sm" id="buttonDelete" itemButton="'.$user['id_usuario'].'"><i class="fas fa-user-times text-danger"></i></button>
-                                            </div>
-                                        </td>
-                                    </tr>';
-                                }
-                            }
-                        ?>
-                        </tbody>
-                    </table>
+				<table class="table table-separate table-head-custom table-checkable table-sm" id="kt_datatable">
+					<thead>
+						<tr>
+							<th class="text-center">N°</th>
+							<th>nombre</th>
+							<th>apellido</th>
+							<th>usuario</th>
+							<th>dni</th>
+							<th>telefono</th>
+							<th>nombreperfil</th>
+							<th>accion</th>
+						</tr>
+					</thead>
+				</table>
+	
+	
                     <!--end: Datatable-->
                 </div>
             </div>
