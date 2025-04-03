@@ -8,9 +8,8 @@ use App\Models\ActAreasModel;
 use CodeIgniter\API\ResponseTrait;
 
 class User extends Controller
-
-	 use ResponseTrait;
 {
+	use ResponseTrait;
     protected $modUser;
     protected $modArea;
     public function __construct()
