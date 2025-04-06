@@ -37,7 +37,7 @@
                         </h3>
                     </div>
                     <div class="card-toolbar">
-                        <div class="dropdown dropdown-inline mr-2">
+                        <div class="dropdown dropdown-inline ml-2">
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#formRegistro">
                                 <i class="fas fa-plus"></i> Crear Carpeta
                             </button>
@@ -46,6 +46,16 @@
                 </div>
                 <div class="card-body">
                     <!--begin::Row-->
+                    <div class="d-flex justify-content-end mb-5">
+                        <div class="input-group input-group-sm" style="width: 250px;">
+                            <input type="text" id="buscador" class="form-control form-control-sm" placeholder="Buscar carpeta...">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row" id="cardsContainer">
                         <?php if (!empty($carpetas)): ?>
                             <?php foreach ($carpetas as $carpeta): ?>
@@ -186,3 +196,49 @@
         border-color: #004085;
     }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#buscador').on('keyup', function() {
+            let nombre = $(this).val();
+
+            $.ajax({
+                url: '<?= base_url("SegCarpetas/buscar") ?>',
+                method: 'GET',
+                data: {
+                    nombre: nombre
+                },
+                dataType: 'json',
+                success: function(data) {
+                    let cards = '';
+
+                    if (data.length > 0) {
+                        data.forEach(function(carpeta) {
+                            cards += `
+                        <div class="col-md-3 mb-4">
+                            <div class="card folder-card">
+                                <div class="card-header folder-header">
+                                    <i class="fas fa-folder fa-3x text-warning"></i>
+                                    <h5 class="card-title mt-2">${carpeta.nombre_carpeta}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text"><strong>Programa:</strong> ${carpeta.nombre_programa}</p>
+                                    <p class="card-text"><strong>Descripción:</strong> ${carpeta.descripcion ?? 'Sin descripción'}</p>
+                                    <a href="<?= base_url("SegCarpetas/listarFuentes") ?>/${carpeta.id_categoria}/${carpeta.id_programa}/${carpeta.id_carpeta}" class="btn btn-primary btn-block">
+                                        <i class="fas fa-eye"></i> Ver Fuentes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
+                        });
+                    } else {
+                        cards = `<div class="col-12"><p class="text-center">No hay carpetas con ese nombre.</p></div>`;
+                    }
+
+                    $('#cardsContainer').html(cards);
+                }
+            });
+        });
+    });
+</script>

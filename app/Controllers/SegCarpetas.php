@@ -325,7 +325,7 @@ class SegCarpetas extends Controller
 
         // Obtener los clasificadores específicos para esta combinación de programa, fuente y meta
         $data = [
-            'SegCentrocostos'=>$SegCentrocostos,
+            'SegCentrocostos' => $SegCentrocostos,
             'clasificadores' => $this->detalleSeguimientoModel->getClasForGroup($id_categoria, $id_programa, $id_fuente, $id_meta),
             'categoriaNombre' => $categoriaNombre,
             'programaNombre' => $programaNombre,
@@ -504,7 +504,7 @@ class SegCarpetas extends Controller
                 'certificacion_rebaja' => ($this->request->getPost('tipo_certificacion') === 'rebaja') ? $this->request->getPost('dinero') : 0,
                 'certificacion_ampliacion' => ($this->request->getPost('tipo_certificacion') === 'ampliacion') ? $this->request->getPost('dinero') : 0,
                 'estado' => true,
-                'id_centro_costos'=>$idCentro ? $idCentro : null
+                'id_centro_costos' => $idCentro ? $idCentro : null
             ];
 
             // Inserta el certificado y responde
@@ -585,7 +585,7 @@ class SegCarpetas extends Controller
                 'certificacion_rebaja' => 0,
                 'certificacion_ampliacion' => 0,
                 'estado' => true,
-                'id_centro_costos'=>$idCentro ? $idCentro : null
+                'id_centro_costos' => $idCentro ? $idCentro : null
             ];
 
             $this->certificadosModel->crearCertificado($data);
@@ -641,5 +641,24 @@ class SegCarpetas extends Controller
         } else {
             return $this->response->setJSON(['success' => false, 'message' => 'Error al actualizar la nota modificatoria.']);
         }
+    }
+
+    public function buscar()
+    {
+        $nombre = $this->request->getGet('nombre');
+        $carpetas = $this->carpetaModel->where('id_carpeta_padre', null)
+            ->like('nombre_carpeta', $nombre)
+            ->findAll();
+    
+
+        foreach ($carpetas as &$carpeta) {
+            if ($carpeta['id_programa']) {
+                $carpeta['nombre_programa'] = $this->carpetaModel->getProgramaNombre($carpeta['id_programa']);
+            } else {
+                $carpeta['nombre_programa'] = 'Sin programa';
+            }
+        }
+        
+        return $this->response->setJSON($carpetas);
     }
 }
