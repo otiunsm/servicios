@@ -218,7 +218,7 @@ class SegCarpetas extends Controller
         }
 
         // Pasar los datos a la vista
-        $scripts = ['scripts' => []]; // Agrega scripts si es necesario
+        $scripts = ['scripts' => ['js/seg_carpetasProgramas.js?v=7.1.6']]; 
         $this->viewData('seguimiento/carpetasProgramas', [
             'carpetas' => $carpetas,
             'categorias' => $categorias,
@@ -259,7 +259,7 @@ class SegCarpetas extends Controller
         ];
 
         // Pasar otros datos necesarios y scripts
-        $scripts = ['scripts' => []]; // Agrega scripts si es necesario
+        $scripts = ['scripts' => ['js/seg_carpetasProgramas.js?v=7.1.6']];
         $this->viewData('seguimiento/carpetasFuentes', $data, $scripts);
     }
 
@@ -302,7 +302,7 @@ class SegCarpetas extends Controller
         ];
 
         // Pasar otros datos necesarios y scripts
-        $scripts = ['scripts' => []]; // Agrega scripts si es necesario
+        $scripts = ['scripts' => ['js/seg_carpetasProgramas.js?v=7.1.6']];
         $this->viewData('seguimiento/carpetasMetas', $data, $scripts);
     }
 
@@ -643,22 +643,47 @@ class SegCarpetas extends Controller
         }
     }
 
-    public function buscar()
+    public function buscarCarpetas()
     {
         $nombre = $this->request->getGet('nombre');
-        $carpetas = $this->carpetaModel->where('id_carpeta_padre', null)
-            ->like('nombre_carpeta', $nombre)
-            ->findAll();
-    
+        $idCategoria = $this->request->getGet('id_categoria');
+        $idPrograma = $this->request->getGet('id_programa');
+        $idFuente = $this->request->getGet('id_fuente');
+        $idCarpetaPadre = $this->request->getGet('id_carpeta_padre');
+
+        $builder = $this->carpetaModel;
+
+        // Aplicar filtros condicionales
+        if (!empty($idCategoria)) {
+            $builder = $builder->where('id_categoria', $idCategoria);
+        }
+
+        if (!empty($idPrograma)) {
+            $builder = $builder->where('id_programa', $idPrograma);
+        }
+
+        if (!empty($idFuente)) {
+            $builder = $builder->where('id_fuente', $idFuente);
+        }
+
+        if ($idCarpetaPadre === 'null' || is_null($idCarpetaPadre) || $idCarpetaPadre === '') {
+            $builder = $builder->where('id_carpeta_padre', null);
+        } else {
+            $builder = $builder->where('id_carpeta_padre', $idCarpetaPadre);
+        }
+
+        if (!empty($nombre)) {
+            $builder = $builder->like('nombre_carpeta', $nombre);
+        }
+
+        $carpetas = $builder->findAll();
 
         foreach ($carpetas as &$carpeta) {
-            if ($carpeta['id_programa']) {
-                $carpeta['nombre_programa'] = $this->carpetaModel->getProgramaNombre($carpeta['id_programa']);
-            } else {
-                $carpeta['nombre_programa'] = 'Sin programa';
-            }
+            $carpeta['nombre_programa'] = $carpeta['id_programa'] ? ($this->programaModel->find($carpeta['id_programa'])['nombre_programa'] ?? 'Sin programa') : 'Sin programa';
+            $carpeta['nombre_fuente'] = $carpeta['id_fuente'] ? ($this->fuenteModel->find($carpeta['id_fuente'])['nombre_fuente'] ?? 'Sin fuente') : 'Sin fuente';
+            $carpeta['nombre_meta'] = $carpeta['id_meta'] ? ($this->metaModel->find($carpeta['id_meta'])['nombre_meta'] ?? 'Sin meta') : 'Sin meta';
         }
-        
+
         return $this->response->setJSON($carpetas);
     }
 }

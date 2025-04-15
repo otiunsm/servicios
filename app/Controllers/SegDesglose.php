@@ -290,4 +290,20 @@ class SegDesglose extends Controller
         // Devuelve los resultados en formato JSON
         return $this->response->setJSON($certificados);
     }
+    public function buscarDesgloses()
+{
+    $nombre = $this->request->getGet('nombre');
+
+    $query = $this->desgloseModel->getDesgloses();
+
+    if (!empty($nombre)) {
+        // Filtrar por coincidencia en nombre del desglose
+        $query = array_filter($query, function ($item) use ($nombre) {
+            return stripos($item['nombre_desglose'], $nombre) !== false;
+        });
+    }
+
+    return $this->response->setJSON(array_values($query));
+}
+
 }

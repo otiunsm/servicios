@@ -124,4 +124,49 @@ document.addEventListener('DOMContentLoaded', function() {
             $('#id_meta').empty().prop('disabled', true).selectpicker('refresh');
         }
     });
-}); 
+});
+
+const $buscadorDesglose = $('#buscadorDesglose');
+
+$buscadorDesglose.on('keyup', function () {
+    $.ajax({
+        url: $buscadorDesglose.data('url'),
+        method: 'GET',
+        data: {
+            nombre: $buscadorDesglose.val()
+        },
+        dataType: 'json',
+        success: function (data) {
+            let cards = '';
+
+            if (data.length > 0) {
+                data.forEach(function (desglose) {
+                    cards += `
+                        <div class="col-md-3 mb-4">
+                            <div class="card folder-card">
+                                <div class="card-header folder-header">
+                                    <i class="fas fa-folder fa-3x text-warning"></i>
+                                    <h5 class="card-title mt-2">${desglose.nombre_desglose}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <strong>Categoría:</strong> ${desglose.nombre_categoria}<br>
+                                        <strong>Programa:</strong> ${desglose.nombre_programa}<br>
+                                        <strong>Fuente:</strong> ${desglose.nombre_fuente}<br>
+                                        <strong>Meta:</strong> ${desglose.nombre_meta}
+                                    </p>
+                                    <a href="${BASE_URL}SegDesglose/listar/${desglose.id_categoria}/${desglose.id_programa}/${desglose.id_fuente}/${desglose.id_meta}" class="btn btn-primary btn-block">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                cards = `<div class="col-12"><p class="text-center">No hay desgloses con ese nombre.</p></div>`;
+            }
+
+            $('.card-body .row').html(cards);
+        }
+    });
+});

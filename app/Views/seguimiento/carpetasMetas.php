@@ -53,8 +53,26 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!--begin::Row-->
-                    <div class="row">
+                <div class="d-flex justify-content-end mb-5">
+                        <div class="input-group input-group-sm" style="width: 250px;">
+                            <input type="text" id="buscador"
+                                data-vista="meta"
+                                data-url="<?= base_url('SegCarpetas/buscarCarpetas') ?>"
+                                data-categoria="<?= $id_categoria ?>"
+                                data-programa="<?= $id_programa ?>"
+                                data-fuente="<?= $id_fuente ?>"
+                                data-meta=""
+                                data-padre="<?= $idCarpetaPadre ?>"
+                                class="form-control form-control-sm" placeholder="Buscar carpeta...">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="cardsContainer">
                         <?php if (!empty($carpetas)): ?>
                             <?php foreach ($carpetas as $carpeta): ?>
                                 <div class="col-md-3 mb-4">
@@ -64,7 +82,6 @@
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
-                                            <h5 class="card-title"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                             <p class="card-text">
                                                 <strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?><br>
                                                 <strong>Fuente:</strong> <?= esc($carpeta['nombre_fuente']) ?><br>
@@ -209,3 +226,8 @@
         border-color: #004085;
     }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+</script>

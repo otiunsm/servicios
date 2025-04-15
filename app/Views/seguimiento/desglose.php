@@ -47,7 +47,18 @@
                 </div>
                 <div class="card-body">
                     <!--begin::Row-->
-                    <div class="row">
+                    <div class="d-flex justify-content-end mb-5">
+                        <div class="input-group input-group-sm" style="width: 250px;">
+                            <input type="text" id="buscadorDesglose"
+                                data-url="<?= base_url('SegDesglose/buscarDesgloses') ?>"
+                                class="form-control form-control-sm"
+                                placeholder="Buscar desglose...">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="buscadorDesglose">
                         <?php if (!empty($desgloses)): ?>
                             <?php foreach ($desgloses as $desglose): ?>
                                 <div class="col-md-3 mb-4">
@@ -61,7 +72,7 @@
                                                 <strong>Categoria:</strong> <?= $desglose['nombre_categoria'] ?> <br>
                                                 <strong>Programa:</strong> <?= $desglose['nombre_programa'] ?> <br>
                                                 <strong>Fuente:</strong> <?= $desglose['nombre_fuente'] ?> <br>
-                                                <strong>Meta:</strong> <?= $desglose['nombre_meta'] ?> 
+                                                <strong>Meta:</strong> <?= $desglose['nombre_meta'] ?>
                                             </p>
                                             <a href="<?= base_url("SegDesglose/listar/{$desglose['id_categoria']}/{$desglose['id_programa']}/{$desglose['id_fuente']}//{$desglose['id_meta']}") ?>" class="btn btn-primary btn-block">
                                                 <i class="fas fa-eye"></i>Ver
@@ -208,3 +219,9 @@
         border-color: #004085;
     }
 </style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+</script>
