@@ -14,9 +14,6 @@
                     <!--end::Page Title-->
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
-                        </li>
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
@@ -46,19 +43,23 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!--begin::Row-->
                     <div class="d-flex justify-content-end mb-5">
                         <div class="input-group input-group-sm" style="width: 250px;">
-                            <input type="text" id="buscadorDesglose"
+                            <input type="text" id="buscador" class="form-control form-control-sm"
+                                data-vista="general"
                                 data-url="<?= base_url('SegDesglose/buscarDesgloses') ?>"
-                                class="form-control form-control-sm"
-                                placeholder="Buscar desglose...">
+                                data-categoria="<?= $filtros['id_categoria'] ?? '' ?>"
+                                data-programa="<?= $filtros['id_programa'] ?? '' ?>"
+                                data-fuente="<?= $filtros['id_fuente'] ?? '' ?>"
+                                placeholder="Buscar...">
                             <div class="input-group-append">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <div class="row" id="buscadorDesglose">
+                    <div class="row" id="cardsContainer">
                         <?php if (!empty($desgloses)): ?>
                             <?php foreach ($desgloses as $desglose): ?>
                                 <div class="col-md-3 mb-4">

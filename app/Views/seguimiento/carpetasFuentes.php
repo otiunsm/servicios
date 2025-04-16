@@ -15,10 +15,7 @@
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
                         <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Programa Presupuestal</a>
+                            <a href="<?= base_url("SegCarpetas") ?>" class="text-muted">Programa Presupuestal</a>
                         </li>
                     </ul>
                     <!--end::Breadcrumb-->

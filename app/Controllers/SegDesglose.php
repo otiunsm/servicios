@@ -169,7 +169,7 @@ class SegDesglose extends Controller
 
         // Obtener los clasificadores específicos para esta combinación de programa, fuente y meta
         $data = [
-            'SegCentrocostos'=>$SegCentrocostos,
+            'SegCentrocostos' => $SegCentrocostos,
             'clasificadores' => $this->detalleSeguimientoModel->getClasForGroup($id_categoria, $id_programa, $id_fuente, $id_meta),
             'categoriaNombre' => $categoriaNombre,
             'programaNombre' => $programaNombre,
@@ -196,7 +196,7 @@ class SegDesglose extends Controller
         $metaNombre = $this->metaModel->find($id_meta)['nombre_meta'];
         $metaCod = $this->metaModel->find($id_meta)['codigo_meta'];
         $centroNombre = $this->SegCentrocostosModel->find($id_centro_costos)['nombrecen'] ?? 'Centro Desconocido';
-    
+
         // Consulta corregida con filtro efectivo por centro de costos
         $clasificadores = $this->detalleSeguimientoModel
             ->select('
@@ -206,20 +206,20 @@ class SegDesglose extends Controller
                 detalle_seguimiento.PIM_acumulado AS PIM
             ')
             ->join('clasificadores', 'clasificadores.id_clasificador = detalle_seguimiento.id_clasificador')
-            ->join('certificados', 'certificados.id_detalle = detalle_seguimiento.id_detalle AND certificados.id_centro_costos = '.$id_centro_costos, 'left')
+            ->join('certificados', 'certificados.id_detalle = detalle_seguimiento.id_detalle AND certificados.id_centro_costos = ' . $id_centro_costos, 'left')
             ->where('detalle_seguimiento.id_categoria', $id_categoria)
             ->where('detalle_seguimiento.id_programa', $id_programa)
             ->where('detalle_seguimiento.id_fuente', $id_fuente)
             ->where('detalle_seguimiento.id_meta', $id_meta)
             ->groupBy('clasificadores.id_clasificador')
             ->findAll();
-    
+
         // Calcular saldos específicos por centro
         foreach ($clasificadores as &$clasificador) {
             $clasificador['certificacion'] = $clasificador['certificacion'] ?? 0;
             $clasificador['saldo'] = $clasificador['PIM'] - $clasificador['certificacion'];
         }
-    
+
         // Preparar datos para la vista
         $data = [
             'clasificadores' => $clasificadores,
@@ -231,7 +231,7 @@ class SegDesglose extends Controller
             'centroNombre' => $centroNombre,
             'id_centro_costos' => $id_centro_costos
         ];
-    
+
         return $this->ViewData('/seguimiento/resumen_gastos', $data, ['scripts' => ['js/seg_resumengastos.js?v=7.1.6']]);
     }
 
@@ -290,20 +290,71 @@ class SegDesglose extends Controller
         // Devuelve los resultados en formato JSON
         return $this->response->setJSON($certificados);
     }
+
     public function buscarDesgloses()
-{
-    $nombre = $this->request->getGet('nombre');
+    {
+        $nombre = $this->request->getGet('nombre');
+        $vista = $this->request->getGet('vista');
+        $idCategoria = $this->request->getGet('id_categoria');
+        $idPrograma = $this->request->getGet('id_programa');
+        $idFuente = $this->request->getGet('id_fuente');
+        $idMeta = $this->request->getGet('id_meta');
 
-    $query = $this->desgloseModel->getDesgloses();
+        if ($vista === 'centro') {
+            // Desglose por centro de costos
+            $desgloses = $this->desgloseModel
+                ->select('desglose.*, 
+                 cat.nombre_categoria, 
+                 pp.nombre_programa, 
+                 ff.nombre_fuente, 
+                 m.nombre_meta,
+                 cc.nombrecen as nombre_centro')
+                ->join('categorias cat', 'cat.id_categoria = desglose.id_categoria')
+                ->join('programas_presupuestales pp', 'pp.id_programa = desglose.id_programa')
+                ->join('fuentes_financiamiento ff', 'ff.id_fuente = desglose.id_fuente')
+                ->join('metas m', 'm.id_meta = desglose.id_meta')
+                ->join('centro_de_costos cc', 'cc.idCentro = desglose.id_centro_costos')
+                ->where('desglose.id_categoria', $idCategoria)
+                ->where('desglose.id_programa', $idPrograma)
+                ->where('desglose.id_fuente', $idFuente)
+                ->where('desglose.estado', 1)
+                ->findAll();
 
-    if (!empty($nombre)) {
-        // Filtrar por coincidencia en nombre del desglose
-        $query = array_filter($query, function ($item) use ($nombre) {
-            return stripos($item['nombre_desglose'], $nombre) !== false;
-        });
+            // Filtrar por nombre del centro de costos
+            if (!empty($nombre)) {
+                $desgloses = array_filter($desgloses, function ($item) use ($nombre) {
+                    return stripos($item['nombre_centro'], $nombre) !== false;
+                });
+            }
+            return $this->response->setJSON(array_values($desgloses));
+            
+        } else {
+            $desgloses = $this->desgloseModel
+                ->select('desglose.*, 
+                 cat.nombre_categoria, 
+                 pp.nombre_programa, 
+                 ff.nombre_fuente, 
+                 m.nombre_meta,
+                 cc.nombrecen as nombre_centro')
+                ->join('categorias cat', 'cat.id_categoria = desglose.id_categoria')
+                ->join('programas_presupuestales pp', 'pp.id_programa = desglose.id_programa')
+                ->join('fuentes_financiamiento ff', 'ff.id_fuente = desglose.id_fuente')
+                ->join('metas m', 'm.id_meta = desglose.id_meta')
+                ->join('centro_de_costos cc', 'cc.idCentro = desglose.id_centro_costos')
+                ->where('desglose.id_categoria', $idCategoria)
+                ->where('desglose.id_programa', $idPrograma)
+                ->where('desglose.id_fuente', $idFuente)
+                ->where('desglose.id_meta', $idMeta)
+                ->where('desglose.estado', 1)
+                ->findAll();
+
+            if (!empty($nombre)) {
+                $desgloses = array_filter($desgloses, function ($item) use ($nombre) {
+                    return stripos($item['nombre_centro'], $nombre) !== false;
+                });
+            }
+
+            return $this->response->setJSON(array_values($desgloses));
+        }
     }
-
-    return $this->response->setJSON(array_values($query));
-}
-
 }

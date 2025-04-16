@@ -227,7 +227,7 @@ class SegCarpetas extends Controller
     }
 
     // Método para listar carpetas de fuentes
-    public function listarFuentes($idCategoria, $idPrograma, $idCarpetaPadre)
+    public function listarFuentes($idCarpetaPadre, $idCategoria, $idPrograma )
     {
         // Obtener las carpetas de fuentes (carpetas con id_carpeta_padre igual al id_carpeta_padre proporcionado)
         $carpetas = $this->carpetaModel
@@ -270,8 +270,11 @@ class SegCarpetas extends Controller
             ->where('id_categoria', $idCategoria)
             ->where('id_programa', $idPrograma)
             ->where('id_fuente', $idFuente)
-            ->where('id_carpeta_padre', $idCarpetaPadre) // Filtrar por id_carpeta_padre
+            ->where('id_carpeta_padre', $idCarpetaPadre) 
             ->findAll();
+        
+        $carpetaFuente = $this->carpetaModel->find($idCarpetaPadre);
+        $idCarpetaPadreFuente = $carpetaFuente['id_carpeta_padre'];
 
         // Obtener los nombres de categoría, programa, fuente y metas para mostrarlos en la vista
         $metas = $this->metaModel->findAll();
@@ -296,8 +299,9 @@ class SegCarpetas extends Controller
             'id_categoria' => $idCategoria,
             'id_programa' => $idPrograma,
             'id_fuente' => $idFuente,
-            'idCarpetaPadre' => $idCarpetaPadre, // Pasar el id_carpeta_padre a la vista
-            'metas' => $metas, // Pasar las metas disponibles para el modal
+            'idCarpetaPadre' => $idCarpetaPadre,
+            'idCarpetaPadreFuente' => $idCarpetaPadreFuente,
+            'metas' => $metas, 
             'clasificadores' => $clasificadores,
         ];
 

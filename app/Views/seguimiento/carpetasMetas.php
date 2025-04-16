@@ -15,13 +15,13 @@
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
                         <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
+                            <a href="<?= base_url("SegCarpetas") ?>" class="text-muted">Programa Presupuestal</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Programa Presupuestal</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Fuentes de Financiamiento</a>
+                            <a href="<?= base_url("SegCarpetas/listarFuentes/{$idCarpetaPadreFuente}/{$id_categoria}/{$id_programa}") ?>" class="text-muted">
+                                Fuentes de Financiamiento
+                            </a>
+
                         </li>
                     </ul>
                     <!--end::Breadcrumb-->
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                <div class="d-flex justify-content-end mb-5">
+                    <div class="d-flex justify-content-end mb-5">
                         <div class="input-group input-group-sm" style="width: 250px;">
                             <input type="text" id="buscador"
                                 data-vista="meta"
@@ -78,7 +78,7 @@
                                 <div class="col-md-3 mb-4">
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
-                                            <i class="fas fa-file-excel fa-3x text-success"></i> 
+                                            <i class="fas fa-file-excel fa-3x text-success"></i>
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">

@@ -13,9 +13,6 @@
                     </h5>
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Inicio</a>
-                        </li>
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
@@ -75,7 +72,7 @@
                                         <div class="card-body">
                                             <p class="card-text"><strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?></p>
                                             <p class="card-text"><strong>Descripción:</strong> <?= esc($carpeta['descripcion'] ?? 'Sin descripción') ?></p>
-                                            <a href="<?= base_url("SegCarpetas/listarFuentes/{$carpeta['id_categoria']}/{$carpeta['id_programa']}/{$carpeta['id_carpeta']}") ?>" class="btn btn-primary btn-block">
+                                            <a href="<?= base_url("SegCarpetas/listarFuentes/{$carpeta['id_carpeta']}/{$carpeta['id_categoria']}/{$carpeta['id_programa']}") ?>" class="btn btn-primary btn-block">
                                                 <i class="fas fa-eye"></i> Ver Fuentes
                                             </a>
                                         </div>
