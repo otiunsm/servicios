@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\SegCentrocostosModel;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SegCentrocostos extends Controller
 {
@@ -88,7 +88,7 @@ class SegCentrocostos extends Controller
         if ($this->request->isAJAX()) {
             $response = $this->centroCostosModel->obtenerCentroCostoPorID($id);
             $mensaje = $response ? ["Status" => '200', "Mensaje" => $response]
-                                 : ["Status" => '404', "Mensaje" => "No se encontró el centro de costos."];
+                : ["Status" => '404', "Mensaje" => "No se encontró el centro de costos."];
             return $this->response->setJSON($mensaje);
         } else {
             return redirect()->to(base_url() . "/SegCentrocostos");
@@ -156,5 +156,54 @@ class SegCentrocostos extends Controller
         } else {
             return redirect()->to(base_url() . "/SegCentrocostos");
         }
+    }
+
+    public function importarExcel()
+    {
+        $file = $this->request->getFile('archivo_excel');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestDataRow(); // última fila con contenido
+            $insertados = 0;
+            $omitidos = 0;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $codigo = trim($sheet->getCell("A$row")->getValue());
+                $nombre = trim($sheet->getCell("B$row")->getValue());
+                $descripcion = trim($sheet->getCell("C$row")->getValue());
+
+                if (empty($codigo) || empty($nombre)) continue;
+
+                // Verificar duplicados
+                $existe = $this->centroCostosModel
+                    ->where('codigocen', $codigo)
+                    ->first();
+
+                if (!$existe) {
+                    $this->centroCostosModel->insert([
+                        'codigocen' => $codigo,
+                        'nombrecen' => $nombre,
+                        'descripcion' => $descripcion,
+                        'estado' => 1
+                    ]);
+                    $insertados++;
+                } else {
+                    $omitidos++;
+                }
+            }
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'success',
+                "Mensaje" => "Importación completa. Insertados: $insertados | Duplicados omitidos: $omitidos"
+            ]);
+        } else {
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'error',
+                "Mensaje" => "Error al subir el archivo. Verifica que sea un archivo válido."
+            ]);
+        }
+
+        return redirect()->to(base_url("SegCentrocostos"));
     }
 }

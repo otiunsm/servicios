@@ -26,8 +26,11 @@
                         </h3>
                     </div>
                     <div class="card-toolbar">
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#formFuente">
+                        <button type="button" class="btn btn-primary btn-sm mr-4" data-toggle="modal" data-target="#formFuente">
                             <i class="fas fa-plus"></i> Nueva Fuente
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#formImportar">
+                            <i class="fas fa-upload mr-1"></i> Importar Fuentes
                         </button>
                     </div>
                 </div>
@@ -145,3 +148,32 @@
     </div>
 </div>
 
+<div class="modal fade" id="formImportar" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdrop" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content" id="kt_login2">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Importar Fuentes de Financiamiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <form method="POST" action="<?= base_url('SegFuentes/importarExcel') ?>" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Selecciona archivo Excel (.xlsx)</label>
+                        <input type="file" name="archivo_excel" class="form-control-file mb-3 mt-" accept=".xlsx" required>
+                        <small class="form-text text mt-1">
+                            <a href="<?= base_url('plantillas/Plantilla.xlsx') ?>" download class="text-primary">
+                                 Descargar plantilla
+                            </a>
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success font-weight-bold">Cargar</button>
+                    <button type="button" class="btn btn-light-danger font-weight-bold" data-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

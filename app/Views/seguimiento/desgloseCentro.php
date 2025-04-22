@@ -41,13 +41,15 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-end mb-5">
                         <div class="input-group input-group-sm" style="width: 250px;">
-                            <input type="text" class="form-control form-control-sm" id="buscador"
+                            <input type="text" id="buscadorDesglose"
+                                class="form-control form-control-sm"
                                 data-vista="centro"
                                 data-url="<?= base_url('SegDesglose/buscarDesgloses') ?>"
-                                data-categoria="<?= $filtros['id_categoria'] ?? '' ?>"
-                                data-programa="<?= $filtros['id_programa'] ?? '' ?>"
-                                data-fuente="<?= $filtros['id_fuente'] ?? '' ?>"
-                                placeholder="Buscar...">
+                                data-categoria="<?= $id_categoria ?? ''?>"
+                                data-programa="<?= $id_programa ?? ''?>"
+                                data-fuente="<?= $id_fuente ?? ''?>"
+                                data-meta="<?= $id_meta ?? ''?>"
+                                placeholder="Buscar desglose...">
                             <div class="input-group-append">
                                 <span class="input-group-text">
                                     <i class="fas fa-search"></i>

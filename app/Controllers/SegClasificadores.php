@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\SegClasificadorModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SegClasificadores extends Controller
 {
@@ -160,6 +161,55 @@ class SegClasificadores extends Controller
         } else {
             return redirect()->to(base_url() . "/SegClasificadores");
         }
+    }
+
+    public function importarExcel()
+    {
+        $file = $this->request->getFile('archivo_excel');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestDataRow(); // última fila con contenido
+            $insertados = 0;
+            $omitidos = 0;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $codigo = trim($sheet->getCell("A$row")->getValue());
+                $nombre = trim($sheet->getCell("B$row")->getValue());
+                $descripcion = trim($sheet->getCell("C$row")->getValue());
+
+                if (empty($codigo) || empty($nombre)) continue;
+
+                // Verificar duplicados
+                $existe = $this->clasificadorModel
+                    ->where('codigo_clasificador', $codigo)
+                    ->first();
+
+                if (!$existe) {
+                    $this->clasificadorModel->insert([
+                        'codigo_clasificador' => $codigo,
+                        'nombre_clasificador' => $nombre,
+                        'descripcion' => $descripcion,
+                        'estado' => 1
+                    ]);
+                    $insertados++;
+                } else {
+                    $omitidos++;
+                }
+            }
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'success',
+                "Mensaje" => "Importación completa. Insertados: $insertados | Duplicados omitidos: $omitidos"
+            ]);
+        } else {
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'error',
+                "Mensaje" => "Error al subir el archivo. Verifica que sea un archivo válido."
+            ]);
+        }
+
+        return redirect()->to(base_url("SegClasificadores"));
     }
 
 }

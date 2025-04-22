@@ -294,48 +294,53 @@ class SegDesglose extends Controller
     public function buscarDesgloses()
     {
         $nombre = $this->request->getGet('nombre');
-        $vista = $this->request->getGet('vista');
         $idCategoria = $this->request->getGet('id_categoria');
-        $idPrograma = $this->request->getGet('id_programa');
-        $idFuente = $this->request->getGet('id_fuente');
-        $idMeta = $this->request->getGet('id_meta');
-
-        if ($vista === 'centro') {
-            // Desglose por centro de costos
-            $desgloses = $this->desgloseModel
-                ->select('desglose.*, 
-                 cat.nombre_categoria, 
-                 pp.nombre_programa, 
-                 ff.nombre_fuente, 
-                 m.nombre_meta,
-                 cc.nombrecen as nombre_centro')
-                ->join('categorias cat', 'cat.id_categoria = desglose.id_categoria')
-                ->join('programas_presupuestales pp', 'pp.id_programa = desglose.id_programa')
-                ->join('fuentes_financiamiento ff', 'ff.id_fuente = desglose.id_fuente')
-                ->join('metas m', 'm.id_meta = desglose.id_meta')
-                ->join('centro_de_costos cc', 'cc.idCentro = desglose.id_centro_costos')
-                ->where('desglose.id_categoria', $idCategoria)
-                ->where('desglose.id_programa', $idPrograma)
-                ->where('desglose.id_fuente', $idFuente)
-                ->where('desglose.estado', 1)
-                ->findAll();
-
-            // Filtrar por nombre del centro de costos
-            if (!empty($nombre)) {
-                $desgloses = array_filter($desgloses, function ($item) use ($nombre) {
-                    return stripos($item['nombre_centro'], $nombre) !== false;
-                });
-            }
-            return $this->response->setJSON(array_values($desgloses));
+        $idPrograma  = $this->request->getGet('id_programa');
+        $idFuente    = $this->request->getGet('id_fuente');
+        $idMeta      = $this->request->getGet('id_meta');
+        $vista       = $this->request->getGet('vista'); // 'general' o 'centro'
             
+        if ($vista === 'general') {
+            $builder = $this->desgloseModel
+            ->select('desglose.*, 
+                cat.nombre_categoria, 
+                pp.nombre_programa, 
+                ff.nombre_fuente, 
+                m.nombre_meta,
+                cc.nombrecen as nombre_centro')
+            ->join('categorias cat', 'cat.id_categoria = desglose.id_categoria')
+            ->join('programas_presupuestales pp', 'pp.id_programa = desglose.id_programa')
+            ->join('fuentes_financiamiento ff', 'ff.id_fuente = desglose.id_fuente')
+            ->join('metas m', 'm.id_meta = desglose.id_meta')
+            ->join('centro_de_costos cc', 'cc.idCentro = desglose.id_centro_costos')
+            ->where('desglose.estado', 1);
+
+            if (!empty($idCategoria)) $builder->where('desglose.id_categoria', $idCategoria);
+            if (!empty($idPrograma))  $builder->where('desglose.id_programa', $idPrograma);
+            if (!empty($idFuente))    $builder->where('desglose.id_fuente', $idFuente);
+            if (!empty($idMeta))      $builder->where('desglose.id_meta', $idMeta);
+            if (!empty($nombre))      $builder->like('desglose.nombre_desglose', $nombre);
+
+            $resultados = $builder->findAll();
+
+            // Agrupar por combinación única
+            $agrupados = [];
+            foreach ($resultados as $item) {
+                $clave = $item['id_categoria'] . '_' . $item['id_programa'] . '_' . $item['id_fuente'] . '_' . $item['id_meta'];
+                if (!isset($agrupados[$clave])) {
+                    $agrupados[$clave] = $item;
+                }
+            }
+
+            return $this->response->setJSON(array_values($agrupados));
         } else {
-            $desgloses = $this->desgloseModel
+            $builder = $this->desgloseModel
                 ->select('desglose.*, 
-                 cat.nombre_categoria, 
-                 pp.nombre_programa, 
-                 ff.nombre_fuente, 
-                 m.nombre_meta,
-                 cc.nombrecen as nombre_centro')
+                     cat.nombre_categoria, 
+                     pp.nombre_programa, 
+                     ff.nombre_fuente, 
+                     m.nombre_meta,
+                     cc.nombrecen as nombre_centro')
                 ->join('categorias cat', 'cat.id_categoria = desglose.id_categoria')
                 ->join('programas_presupuestales pp', 'pp.id_programa = desglose.id_programa')
                 ->join('fuentes_financiamiento ff', 'ff.id_fuente = desglose.id_fuente')
@@ -344,17 +349,19 @@ class SegDesglose extends Controller
                 ->where('desglose.id_categoria', $idCategoria)
                 ->where('desglose.id_programa', $idPrograma)
                 ->where('desglose.id_fuente', $idFuente)
-                ->where('desglose.id_meta', $idMeta)
-                ->where('desglose.estado', 1)
-                ->findAll();
+                ->where('desglose.estado', 1);
+        
+                
 
             if (!empty($nombre)) {
-                $desgloses = array_filter($desgloses, function ($item) use ($nombre) {
-                    return stripos($item['nombre_centro'], $nombre) !== false;
-                });
-            }
-
-            return $this->response->setJSON(array_values($desgloses));
+            $builder = $builder->like('cc.nombrecen', $nombre);
         }
+        $resultados = $builder->findAll();
+            
+        
+            return $this->response->setJSON($resultados);
+        }
+        
+
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\SegMetaModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SegMetas extends Controller
 {
@@ -176,5 +177,56 @@ class SegMetas extends Controller
         } else {
             return redirect()->to(base_url() . "/SegMetas");
         }
+    }
+    
+    public function importarExcel()
+    {
+        $file = $this->request->getFile('archivo_excel');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestDataRow(); // última fila con contenido
+            $insertados = 0;
+            $omitidos = 0;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $codigo = trim($sheet->getCell("A$row")->getValue());
+                $codigoactividad = trim($sheet->getCell("B$row")->getValue());
+                $nombre = trim($sheet->getCell("C$row")->getValue());
+                $descripcion = trim($sheet->getCell("D$row")->getValue());
+
+                if (empty($codigo) || empty($nombre)) continue;
+
+                // Verificar duplicados
+                $existe = $this->metaModel
+                    ->where('codigo_meta', $codigo)
+                    ->first();
+
+                if (!$existe) {
+                    $this->metaModel->insert([
+                        'codigo_meta' => $codigo,
+                        'codigo_actividad' => $codigoactividad,
+                        'nombre_meta' => $nombre,
+                        'descripcion' => $descripcion,
+                        'estado' => 1
+                    ]);
+                    $insertados++;
+                } else {
+                    $omitidos++;
+                }
+            }
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'success',
+                "Mensaje" => "Importación completa. Insertados: $insertados | Duplicados omitidos: $omitidos"
+            ]);
+        } else {
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'error',
+                "Mensaje" => "Error al subir el archivo. Verifica que sea un archivo válido."
+            ]);
+        }
+
+        return redirect()->to(base_url("SegMetas"));
     }
 }

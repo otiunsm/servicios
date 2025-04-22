@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\SegCategoriaModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SegCategoria extends Controller
 {
@@ -20,7 +21,6 @@ class SegCategoria extends Controller
         $serverDatable  = true;
         $scripts = ['scripts' => ['js/seg_categorias.js?v=7.1.6', 'plugins/custom/datatables/seg_dtserver_categoria.js?v=7.1.6']];
         $this->viewData("/seguimiento/categoria_presupuestal", ["categorias" => $listaCategorias, 'serverDatable' => $serverDatable], $scripts);
-  
     }
 
     public function formData()
@@ -48,11 +48,11 @@ class SegCategoria extends Controller
             if ($isUpdating) {
                 $response = $this->actualizar($data, $postData['id_categoria']);
                 $mensaje = $response ? ["Tipo" => 'success', "Mensaje" => "Actualización Exitosa."]
-                                      : ["Tipo" => 'error', "Mensaje" => "No se pudo actualizar."];
+                    : ["Tipo" => 'error', "Mensaje" => "No se pudo actualizar."];
             } else {
                 $response = $this->registrar($data);
                 $mensaje = $response ? ["Tipo" => 'success', "Mensaje" => "Registro Exitoso."]
-                                      : ["Tipo" => 'error', "Mensaje" => "No se pudo registrar."];
+                    : ["Tipo" => 'error', "Mensaje" => "No se pudo registrar."];
             }
 
             session()->setFlashdata('AlertShow', $mensaje);
@@ -88,7 +88,7 @@ class SegCategoria extends Controller
         if ($this->request->isAJAX()) {
             $response = $this->categoriaModel->obtenerCategoriaPorID($id);
             $mensaje = $response ? ["Status" => '200', "Mensaje" => $response]
-                                 : ["Status" => '404', "Mensaje" => "No se encontró la categoria."];
+                : ["Status" => '404', "Mensaje" => "No se encontró la categoria."];
             return $this->response->setJSON($mensaje);
         } else {
             return redirect()->to(base_url() . "/SegCategoria");
@@ -106,69 +106,116 @@ class SegCategoria extends Controller
         }
         return redirect()->to(base_url() . "/SegCategoria");
     }
-    
+
     public function cargartabla()
-{
-    if ($this->request->isAJAX()) {
-        // Obtener parámetros de DataTables
-        $draw = $this->request->getVar('draw'); // Número de solicitud
-        $start = $this->request->getVar('start'); // Índice de inicio
-        $length = $this->request->getVar('length'); // Número de registros por página
-        $search = $this->request->getVar('search')['value']; // Valor de búsqueda
-        $order = $this->request->getVar('order'); // Parámetros de ordenamiento
+    {
+        if ($this->request->isAJAX()) {
+            // Obtener parámetros de DataTables
+            $draw = $this->request->getVar('draw'); // Número de solicitud
+            $start = $this->request->getVar('start'); // Índice de inicio
+            $length = $this->request->getVar('length'); // Número de registros por página
+            $search = $this->request->getVar('search')['value']; // Valor de búsqueda
+            $order = $this->request->getVar('order'); // Parámetros de ordenamiento
 
-        // Obtener los datos de la base de datos
-        $builder = $this->categoriaModel->table('categorias');
-        $builder->select('id_categoria, codigo_categoria, nombre_categoria, estado');
+            // Obtener los datos de la base de datos
+            $builder = $this->categoriaModel->table('categorias');
+            $builder->select('id_categoria, codigo_categoria, nombre_categoria, estado');
 
-        // Aplicar búsqueda si existe
-        if (!empty($search)) {
-            $builder->groupStart();
-            $builder->orLike('codigo_categoria', $search);
-            $builder->orLike('nombre_categoria', $search);
-            $builder->groupEnd();
-        }
+            // Aplicar búsqueda si existe
+            if (!empty($search)) {
+                $builder->groupStart();
+                $builder->orLike('codigo_categoria', $search);
+                $builder->orLike('nombre_categoria', $search);
+                $builder->groupEnd();
+            }
 
-        // Aplicar ordenamiento
-        if (!empty($order)) {
-            $columnIndex = $order[0]['column']; // Índice de la columna a ordenar
-            $columnDir = $order[0]['dir']; // Dirección del ordenamiento (asc o desc)
+            // Aplicar ordenamiento
+            if (!empty($order)) {
+                $columnIndex = $order[0]['column']; // Índice de la columna a ordenar
+                $columnDir = $order[0]['dir']; // Dirección del ordenamiento (asc o desc)
 
-            // Mapear el índice de la columna al nombre de la columna en la base de datos
-            $columns = [
-                0 => 'codigo_categoria', // Primera columna
-                1 => 'nombre_categoria', // Segunda columna
-                2 => 'estado' // Tercera columna
+                // Mapear el índice de la columna al nombre de la columna en la base de datos
+                $columns = [
+                    0 => 'codigo_categoria', // Primera columna
+                    1 => 'nombre_categoria', // Segunda columna
+                    2 => 'estado' // Tercera columna
+                ];
+
+                if (isset($columns[$columnIndex])) {
+                    $builder->orderBy($columns[$columnIndex], $columnDir);
+                }
+            }
+
+            // Obtener el total de registros (sin paginación)
+            $totalRecords = $builder->countAllResults(false);
+
+            // Aplicar paginación
+            $builder->limit($length, $start);
+
+            // Obtener los datos paginados
+            $categorias = $builder->get()->getResultArray();
+
+            // Preparar la respuesta para DataTables
+            $response = [
+                "draw" => intval($draw), // Número de solicitud
+                "recordsTotal" => $totalRecords, // Total de registros sin filtrar
+                "recordsFiltered" => $totalRecords, // Total de registros filtrados
+                "data" => $categorias // Datos paginados
             ];
 
-            if (isset($columns[$columnIndex])) {
-                $builder->orderBy($columns[$columnIndex], $columnDir);
+            return $this->response->setJSON($response);
+        } else {
+            return redirect()->to(base_url() . "/SegCategoria");
+        }
+    }
+
+
+    public function importarExcel()
+    {
+        $file = $this->request->getFile('archivo_excel');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestDataRow(); // última fila con contenido
+            $insertados = 0;
+            $omitidos = 0;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $codigo = trim($sheet->getCell("A$row")->getValue());
+                $nombre = trim($sheet->getCell("B$row")->getValue());
+                $descripcion = trim($sheet->getCell("C$row")->getValue());
+
+                if (empty($codigo) || empty($nombre)) continue;
+
+                // Verificar duplicados
+                $existe = $this->categoriaModel
+                    ->where('codigo_categoria', $codigo)
+                    ->first();
+
+                if (!$existe) {
+                    $this->categoriaModel->insert([
+                        'codigo_categoria' => $codigo,
+                        'nombre_categoria' => $nombre,
+                        'descripcion' => $descripcion,
+                        'estado' => 1
+                    ]);
+                    $insertados++;
+                } else {
+                    $omitidos++;
+                }
             }
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'success',
+                "Mensaje" => "Importación completa. Insertados: $insertados | Duplicados omitidos: $omitidos"
+            ]);
+        } else {
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'error',
+                "Mensaje" => "Error al subir el archivo. Verifica que sea un archivo válido."
+            ]);
         }
 
-        // Obtener el total de registros (sin paginación)
-        $totalRecords = $builder->countAllResults(false);
-
-        // Aplicar paginación
-        $builder->limit($length, $start);
-
-        // Obtener los datos paginados
-        $categorias = $builder->get()->getResultArray();
-
-        // Preparar la respuesta para DataTables
-        $response = [
-            "draw" => intval($draw), // Número de solicitud
-            "recordsTotal" => $totalRecords, // Total de registros sin filtrar
-            "recordsFiltered" => $totalRecords, // Total de registros filtrados
-            "data" => $categorias // Datos paginados
-        ];
-
-        return $this->response->setJSON($response);
-    } else {
-        return redirect()->to(base_url() . "/SegCategoria");
+        return redirect()->to(base_url("SegCategoria"));
     }
 }
-
-}
-
-

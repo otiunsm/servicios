@@ -126,21 +126,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-const $buscadores = $('#buscador');
+const $buscador = $('#buscadorDesglose');
 
-$buscadores.on('keyup', function () {
-    const $this = $(this);
-    const tipoVista = $this.data('vista');
+$buscador.on('keyup', function () {
+    let vista = $buscador.data('vista');
 
     $.ajax({
-        url: $this.data('url'),
+        url: $buscador.data('url'),
         method: 'GET',
         data: {
-            nombre: $this.val(),
-            vista: tipoVista,
-            id_categoria: $this.data('categoria'),
-            id_programa: $this.data('programa'),
-            id_fuente: $this.data('fuente')
+            nombre: $buscador.val(),
+            id_categoria: $buscador.data('categoria'),
+            id_programa: $buscador.data('programa'),
+            id_fuente: $buscador.data('fuente'),
+            id_meta: $buscador.data('meta'),
+            vista: vista
         },
         dataType: 'json',
         success: function (data) {
@@ -148,60 +148,59 @@ $buscadores.on('keyup', function () {
 
             if (data.length > 0) {
                 data.forEach(function (d) {
-                    if (tipoVista === 'general') {
+                    if (vista === 'centro') {
                         cards += `
-                            <div class="col-md-3 mb-4">
-                                <div class="card folder-card">
-                                    <div class="card-header folder-header">
-                                        <i class="fas fa-folder fa-3x text-warning"></i>
-                                        <h5 class="card-title mt-2">${d.nombre_desglose}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text">
-                                            <strong>Categoría:</strong> ${d.nombre_categoria}<br>
-                                            <strong>Programa:</strong> ${d.nombre_programa}<br>
-                                            <strong>Fuente:</strong> ${d.nombre_fuente}<br>
-                                            <strong>Meta:</strong> ${d.nombre_meta}
-                                        </p>
-                                        <a href="${BASE_URL}SegDesglose/listar/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}" class="btn btn-primary btn-block">
-                                            <i class="fas fa-eye"></i> Ver
-                                        </a>
-                                    </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card folder-card">
+                                <div class="card-header folder-header">
+                                    <i class="fas fa-file-excel fa-3x text-success"></i>
+                                    <h5 class="card-title mt-2">${d.nombre_centro}</h5>
                                 </div>
-                            </div>`;
-                    } else if (tipoVista === 'centro') {
-                        cards += `
-                            <div class="col-md-3 mb-4">
-                                <div class="card folder-card">
-                                    <div class="card-header folder-header">
-                                        <i class="fas fa-file-excel fa-3x text-success"></i>
-                                        <h5 class="card-title mt-2">${d.nombre_centro}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text">
-                                            <strong>Categoría:</strong> ${d.nombre_categoria}<br>
-                                            <strong>Programa:</strong> ${d.nombre_programa}<br>
-                                            <strong>Fuente:</strong> ${d.nombre_fuente}<br>
-                                            <strong>Meta:</strong> ${d.nombre_meta}
-                                        </p>
-                                        <div class="d-flex justify-content-center">
-                                            <div class="btn-group mr-2">
-                                                <a href="${BASE_URL}SegDesglose/ControlGastos/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}/${d.id_centro_costos}" class="btn btn-outline-primary">Ingresar</a>
-                                            </div>
-                                            <div class="btn-group">
-                                                <a href="${BASE_URL}SegDesglose/ResumenGastos/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}/${d.id_centro_costos}" class="btn btn-outline-success">Resumen</a>
-                                            </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <strong>Categoría:</strong> ${d.nombre_categoria}<br>
+                                        <strong>Programa:</strong> ${d.nombre_programa}<br>
+                                        <strong>Fuente:</strong> ${d.nombre_fuente}<br>
+                                        <strong>Meta:</strong> ${d.nombre_meta}
+                                    </p>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="btn-group mr-2">
+                                            <a href="${BASE_URL}SegDesglose/ControlGastos/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}/${d.id_centro_costos}" class="btn btn-outline-primary">Ingresar</a>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a href="${BASE_URL}SegDesglose/ResumenGastos/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}/${d.id_centro_costos}" class="btn btn-outline-success">Resumen</a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>`;
+                            </div>
+                        </div>`;
+                    } else {
+                        cards += `
+                        <div class="col-md-3 mb-4">
+                            <div class="card folder-card">
+                                <div class="card-header folder-header">
+                                    <i class="fas fa-folder fa-3x text-warning"></i>
+                                    <h5 class="card-title mt-2">${d.nombre_desglose}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <strong>Categoría:</strong> ${d.nombre_categoria}<br>
+                                        <strong>Programa:</strong> ${d.nombre_programa}<br>
+                                        <strong>Fuente:</strong> ${d.nombre_fuente}<br>
+                                        <strong>Meta:</strong> ${d.nombre_meta}
+                                    </p>
+                                    <a href="${BASE_URL}SegDesglose/listar/${d.id_categoria}/${d.id_programa}/${d.id_fuente}/${d.id_meta}" class="btn btn-primary btn-block">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
                     }
                 });
             } else {
                 cards = `<div class="col-12"><p class="text-center">No hay resultados encontrados.</p></div>`;
             }
 
-            // Mismo ID para ambas vistas
             $('#cardsContainer').html(cards);
         }
     });
