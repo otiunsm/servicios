@@ -3,9 +3,9 @@
 <!-- jQuery y DataTables JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!--begin::Content-->
+<!-- Diseño mejorado del módulo Control de Gastos -->
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
-    <!--begin::Subheader-->
-    <div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
+<div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
         <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">
             <!--begin::Info-->
             <div class="d-flex align-items-center flex-wrap mr-1">
@@ -27,126 +27,113 @@
             <!--end::Info-->
         </div>
     </div>
-    <!--end::Subheader-->
 
-    <!--begin::Entry-->
-    <div class="d-flex flex-column-fluid">
-        <!--begin::Container-->
-        <div class="container">
-            <!--begin::Card Header-->
-            <div class="card card-custom mb-4">
-                <div class="card-header flex-wrap py-5">
-                    <div class="card-title">
-                        <h3 class="card-label">Clasificadores
-                            <select id="clasificadores" name="clasificadores" class="selectpicker form-control" title="Elige el clasificador...">
-                                <?php foreach ($clasificadores as $clasificador): ?>
-                                    <option value="<?= esc($clasificador['id_clasificador']) ?>"
-                                        data-nombre="<?= esc($clasificador['nombre_clasificador']) ?>">
-                                        <?= esc($clasificador['nombre_clasificador']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-
-                        </h3>
-                    </div>
-                </div>
-            </div>
-            <!--end::Card Header-->
-            <div id="contenidoPantalla" style="display: none;">
-                <!--begin::Card Body-->
-                <div class="card card-custom mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h4 class="text-center">Operaciones</h4>
-                                <div class="text-center align-items-center">
-                                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#formcertificado">
-                                        <i class="fas fa-plus"></i> Certificado
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#formnota">
-                                        <i class="fas fa-plus"></i> Nota Modificatoria
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--begin::Card Body-->
-                <div class="card card-custom mb-4" id="captura" name="captura">
-                    <div class="card-body">
-                        <!-- Botones de exportación -->
-                        <div class="text-center mb-3">
-                            <button onclick="exportToExcel()" class="btn btn-success">Exportar a Excel</button>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Programa:</h10>
-                                    <input type="text" class="form-control" name="codPrograma" value="<?= esc($programaNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Fuente de Financiamiento:</h10>
-                                    <input type="text" class="form-control" name="codFuente" value="<?= esc($fuenteNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">PIA:</h10>
-                                    <input type="text" class="form-control" name="pia" style="width: 120px;" readonly />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Meta:</h10>
-                                    <input type="text" class="form-control" name="nomMeta" value="<?= esc($metaNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">PIM - INICIAL:</h10>
-                                    <input type="text" class="form-control" name="pim" style="width: 120px;" readonly />
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Proyecto/Actividad:</h10>
-                                    <input type="text" class="form-control" name="clasificadorNombre" style="width: 250px;" readonly />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--begin: Datatable-->
-                        <table class="table table-separate table-head-custom table-checkable" id="kt_datatable">
-                            <thead>
-                                <tr class="text-center">
-                                    <th rowspan="2">N°</th>
-                                    <th rowspan="2">Fecha de<br>Ingreso</th>
-                                    <th rowspan="2">Detalle</th>
-                                    <th rowspan="2">Modificación</th>
-                                    <th rowspan="2">PIM</th>
-                                    <th colspan="3">CERTIFICACIÓN</th>
-                                    <th rowspan="2">Saldo</th>
-                                    <th rowspan="2">Acciones</th>
-                                </tr>
-                                <tr class="text-center">
-                                    <th>Monto</th>
-                                    <th>Rebaja</th>
-                                    <th>Ampliación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                        <!--end: Datatable-->
-                    </div>
-                </div>
-                <!--end::Card Body-->
-            </div>
+  <div class="d-flex flex-column-fluid">
+    <div class="container">
+      <!-- Selector de Clasificadores -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header py-4">
+          <h5 class="mb-0">Seleccionar Clasificador</h5>
         </div>
-        <!--end::Container-->
+        <div class="card-body">
+          <select id="clasificadores" name="clasificadores" class="selectpicker form-control" title="Elige el clasificador...">
+            <?php foreach ($clasificadores as $clasificador): ?>
+              <option value="<?= esc($clasificador['id_clasificador']) ?>"
+                      data-nombre="<?= esc($clasificador['nombre_clasificador']) ?>">
+                <?= esc($clasificador['nombre_clasificador']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+
+      <div id="contenidoPantalla" style="display: none;">
+        <!-- Sección Operaciones -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body text-center">
+            <h5 class="font-weight-bold mb-3">Operaciones</h5>
+            <button type="button" class="btn btn-outline-warning mx-2" data-toggle="modal" data-target="#formcertificado">
+              <i class="fas fa-plus"></i> Certificado
+            </button>
+            <button type="button" class="btn btn-outline-primary mx-2" data-toggle="modal" data-target="#formnota">
+              <i class="fas fa-plus"></i> Nota Modificatoria
+            </button>
+          </div>
+        </div>
+
+        <!-- Información General -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row">
+              <?php
+                $campos = [
+                  ['Programa', 'codPrograma', $programaNombre],
+                  ['Fuente de Financiamiento', 'codFuente', $fuenteNombre],
+                  ['PIA', 'pia', ''],
+                  ['Meta', 'nomMeta', $metaNombre],
+                  ['PIM - INICIAL', 'pim', ''],
+                  ['Proyecto/Actividad', 'clasificadorNombre', '']
+                ];
+                foreach ($campos as [$label, $name, $valor]) {
+              ?>
+                <div class="col-12 col-md-6 col-lg-4 mb-3">
+                  <label class="font-weight-bold text-muted mb-1"><?= $label ?>:</label>
+                  <input type="text" class="form-control text-center text-truncate w-100" name="<?= $name ?>" value="<?= esc($valor) ?>" readonly title="<?= esc($valor) ?>">
+                </div>
+              <?php } ?>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Certificaciones -->
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Detalle de Certificaciones</h5>
+              <button onclick="exportToExcel()" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Exportar a Excel
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover text-center" id="kt_datatable">
+                <thead class="thead-light">
+                  <tr>
+                    <th rowspan="2">N°</th>
+                    <th rowspan="2">Fecha Ingreso</th>
+                    <th rowspan="2">Detalle</th>
+                    <th rowspan="2">Modificación</th>
+                    <th rowspan="2">PIM</th>
+                    <th colspan="3">CERTIFICACIÓN</th>
+                    <th rowspan="2">Saldo</th>
+                    <th rowspan="2">Acciones</th>
+                  </tr>
+                  <tr>
+                    <th>Monto</th>
+                    <th>Rebaja</th>
+                    <th>Ampliación</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <!--end::Entry-->
+  </div>
 </div>
+
+<style>
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+  }
+  .form-control[readonly] {
+    background-color: #f9f9f9;
+  }
+</style>
+
 
 <!-- Modal Certificado-->
 <div class="modal fade" id="formcertificado" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdrop" aria-hidden="true">
@@ -240,7 +227,7 @@
 
                             <div class="form-group">
                                 <label>Centro de Costo (Opcional)</label>
-                                <select class="selectpicker form-control" data-live-search="true" id="idCentro" name="idCentritos" title="Elije centro de costo" >
+                                <select class="selectpicker form-control" data-live-search="true" id="idCentro" name="idCentritos" title="Elije centro de costo">
                                     <?php foreach ($SegCentrocostos as $centrocosto): ?>
                                         <option value="<?= $centrocosto['idCentro'] ?>"><?= esc($centrocosto['nombrecen']) ?></option>
                                     <?php endforeach; ?>
@@ -397,10 +384,12 @@
                 id_programa: programaId,
                 id_fuente: fuenteId,
                 id_meta: metaId,
-                id_clasificador: clasificadorId
+                id_clasificador: clasificadorId,
             }, function(response) {
                 // Limpia la tabla antes de llenarla con nuevos datos
-                $('#kt_datatable tbody').empty();
+
+                const table = $('#kt_datatable').DataTable();
+                table.clear();
 
                 let previousPIM = parseFloat(document.getElementsByName("pim")[0]?.value || "");
                 let previousSaldo = parseFloat(document.getElementsByName("pim")[0]?.value || "");
@@ -408,53 +397,41 @@
                 let certificado_acumulado = 0; // Para almacenar la resta del último PIM - Saldo
 
                 response.forEach((certificado, index) => {
-                    let PIM, Saldo;
-
-                    // Asegurarse de que los valores numéricos se traten como números
                     let modificacion = parseFloat(certificado.modificacion) || 0;
                     let monto = parseFloat(certificado.certificacion_monto) || 0;
                     let rebaja = parseFloat(certificado.certificacion_rebaja) || 0;
                     let ampliacion = parseFloat(certificado.certificacion_ampliacion) || 0;
 
-                    // Para las filas posteriores, PIM se calcula sumando la modificación con el PIM anterior
                     PIM = previousPIM + modificacion;
-
-                    // El saldo se calcula sumando el saldo anterior + la modificación - (monto + rebaja - ampliacion)
                     Saldo = previousSaldo + modificacion - monto + (rebaja - ampliacion);
-
-                    // Actualiza las variables para la siguiente iteración
                     previousPIM = PIM;
                     previousSaldo = Saldo;
 
-                    // Asignar el último valor de PIM y calcular certificado_acumulado
                     if (index === response.length - 1) {
                         PIM_acumulado = PIM;
                         certificado_acumulado = PIM - Saldo;
                     }
 
-                    // Inserta la fila en la tabla
-                    $('#kt_datatable tbody').append(`
-            <tr class="text-center">
-                <td>${certificado.codigo_transaccion || ""}</td>
-                <td>${certificado.fecha}</td>
-                <td>${certificado.detalle}</td>
-                <td>${modificacion}</td> 
-                <td>${PIM}</td> 
-                <td>${monto}</td>
-                <td>${rebaja}</td>
-                <td>${ampliacion}</td>
-                <td>${Saldo}</td>
-                <td>
-                    <button class="btn btn-sm" onclick="editarCertificado(${certificado.id_certificado}, '${certificado.codigo_transaccion}', '${certificado.detalle || ""}', ${modificacion}, ${monto}, ${rebaja}, ${ampliacion})">
-                        <i class="fas fa-edit text-success"></i>
-                    </button>
-                    <button class="btn btn-sm" onclick="eliminarCertificado(${certificado.id_certificado})">
-                        <i class="fas fa-trash-alt text-danger"></i>
-                    </button>
-                </td>
-            </tr>
-        `);
+                    table.row.add([
+                        certificado.codigo_transaccion || "",
+                        certificado.fecha,
+                        certificado.detalle,
+                        modificacion,
+                        PIM,
+                        monto,
+                        rebaja,
+                        ampliacion,
+                        Saldo,
+                        `<button class="btn btn-sm" onclick="editarCertificado('${certificado.id_certificado}', '${certificado.codigo_transaccion}', '${certificado.detalle || ""}', ${modificacion}, ${monto}, ${rebaja}, ${ampliacion}, '${certificado.id_centro_costos || 'null'}')">
+                            <i class="fas fa-edit text-success"></i>
+                        </button>
+                        <button class="btn btn-sm" onclick="eliminarCertificado(${certificado.id_certificado})">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </button>`
+                    ]);
                 });
+                table.order([1, 'asc']);
+                table.draw();
 
                 // Actualizar los valores en la base de datos
                 $.ajax({
@@ -650,7 +627,7 @@
     }
 
     // Función para editar certificación
-    function editarCertificado(idCertificado, codigo_transaccion, detalle, modificacion, monto, rebaja, ampliacion) {
+    function editarCertificado(idCertificado, codigo_transaccion, detalle, modificacion, monto, rebaja, ampliacion, idCentro = null) {
         if (modificacion != 0) {
             // Modo de edición para Nota Modificatoria
             $('#formnota').modal('show');
@@ -658,6 +635,8 @@
             $('textarea[name="detalle1"]').val(detalle || ''); // Llena el detalle
             $('input[name="notadinero"]').val(modificacion || ''); // Llena el monto de modificación
             $('input[name="id_certificado"]').val(idCertificado); // Llena el ID del certificado
+            $('select[name="idCentritos"]').val(idCentro).selectpicker('refresh');
+
         } else {
             // Modo de edición para Certificado
             $('#formcertificado').modal('show');
@@ -665,10 +644,11 @@
             $('input[name="certificado"]').val(codigo_transaccion || ''); // Llena el código de certificado
             $('textarea[name="detalle"]').val(detalle || ''); // Llena el detalle
             $('input[name="dinero"]').val(monto || rebaja || ampliacion || ''); // Llena el monto, rebaja o ampliación
-            $('input[name="tipo_certificacion"]')
-                .filter([value = "${monto ? 'monto' : rebaja ? 'rebaja' : 'ampliacion'}"])
-                .prop('checked', true); // Marca el tipo de certificación
+            let tipo = monto ? 'monto' : rebaja ? 'rebaja' : 'ampliacion';
+            $(`input[name="tipo_certificacion"][value="${tipo}"]`).prop('checked', true);
             $('input[name="id_certificado"]').val(idCertificado); // Llena el ID del certificado
+            $('select[name="idCentros"]').val(idCentro).selectpicker('refresh');
+
         }
     }
 </script>

@@ -539,7 +539,7 @@ class SegCarpetas extends Controller
 
         // Consulta para obtener los certificados relacionados con detalle_seguimiento
         $certificados = $this->certificadosModel
-            ->select('certificados.id_certificado, certificados.codigo_transaccion, certificados.fecha, certificados.detalle, certificados.modificacion, certificados.certificacion_monto, certificados.certificacion_rebaja, certificados.certificacion_ampliacion, certificados.estado, detalle_seguimiento.PIA')  // Traer campos de la tabla certificados y de detalle_seguimiento
+            ->select('certificados.id_certificado, certificados.codigo_transaccion, certificados.fecha, certificados.detalle, certificados.modificacion, certificados.certificacion_monto, certificados.certificacion_rebaja, certificados.certificacion_ampliacion, certificados.estado, detalle_seguimiento.PIA, certificados.id_centro_costos')  // Traer campos de la tabla certificados y de detalle_seguimiento
             ->join('detalle_seguimiento', 'detalle_seguimiento.id_detalle = certificados.id_detalle', 'left')  // Hacer el join con detalle_seguimiento
             ->where([
                 'detalle_seguimiento.id_categoria' => $id_categoria,

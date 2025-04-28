@@ -129,11 +129,6 @@
     <!--end::Entry-->
 </div>
 
-
-
-
-
-
 <script>
     function exportToExcel() {
         // Obtener los valores de los campos adicionales
