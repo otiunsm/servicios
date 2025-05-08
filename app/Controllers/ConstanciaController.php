@@ -76,7 +76,7 @@ class ConstanciaController extends Controller
         $logoBase64 = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath));
         $backgroundBase64 = $logoBase64;
 
-        $html = view('constancias/ver_constancia', compact('constancia', 'fechaFormateada', 'logoBase64', 'backgroundBase64'));
+        $html = view('constancias/ver_constancia', compact('constancia', 'fechaFormateada',  'logoBase64', 'backgroundBase64'));
 
         $options = new DompdfOptions();
         $options->set('isRemoteEnabled', true);
