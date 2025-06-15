@@ -11,6 +11,8 @@ use App\Models\SegDetalleSeguimientoModel;
 use App\Models\SegFuenteFinanciamientoModel;
 use App\Models\SegMetaModel;
 use App\Models\SegProgramaPresupuestalModel;
+use App\Models\SegPimInicial;
+
 use CodeIgniter\Controller;
 
 class SegDesglose extends Controller
@@ -24,7 +26,7 @@ class SegDesglose extends Controller
     protected $clasificadoresModel;
     protected $certificadosModel;
     protected $SegCentrocostosModel;
-
+    protected $pimInicialModel;
     public function __construct()
     {
         $this->desgloseModel = new SegDesgloseModel();
@@ -36,6 +38,8 @@ class SegDesglose extends Controller
         $this->clasificadoresModel = new SegClasificadorModel();
         $this->certificadosModel = new SegCertificadosModel();
         $this->SegCentrocostosModel = new SegCentrocostosModel();
+        $this->pimInicialModel = new SegPimInicial();
+
     }
 
     public function index()
@@ -167,6 +171,24 @@ class SegDesglose extends Controller
         $fuenteNombre = $this->fuenteModel->find($id_fuente)['nombre_fuente'];
         $metaNombre = $this->metaModel->find($id_meta)['nombre_meta'];
 
+        //para el oim inicial:
+        // Obtener PIM inicial desde pim_iniciales para este centro y combinación
+        $pimInicial = $this->pimInicialModel
+            ->select('monto_pim')
+            ->join('certificados', 'certificados.id_certificado = pim_iniciales.id_certificado')
+            ->join('detalle_seguimiento', 'detalle_seguimiento.id_detalle = certificados.id_detalle')
+            ->where([
+                'detalle_seguimiento.id_categoria' => $id_categoria,
+                'detalle_seguimiento.id_programa' => $id_programa,
+                'detalle_seguimiento.id_fuente'   => $id_fuente,
+                'detalle_seguimiento.id_meta'     => $id_meta,
+                'pim_iniciales.id_centro_costos'  => $id_centro_costos
+            ])
+            ->first();
+
+        $pimInicialValor = $pimInicial['monto_pim'] ?? 0;
+
+
         // Obtener los clasificadores específicos para esta combinación de programa, fuente y meta
         $data = [
             'SegCentrocostos' => $SegCentrocostos,
@@ -179,7 +201,9 @@ class SegDesglose extends Controller
             'id_programa' => $id_programa,
             'id_fuente' => $id_fuente,
             'id_meta' => $id_meta,
-            'id_centro_costos' => $id_centro_costos
+            'id_centro_costos' => $id_centro_costos,
+            'pim_inicial' => $pimInicialValor,
+
         ];
 
         // Pasar otros datos necesarios y scripts
@@ -187,81 +211,138 @@ class SegDesglose extends Controller
         return $this->ViewData('/seguimiento/control_gastosCentros', $data, $scripts);
     }
 
-    public function ResumenGastos($id_categoria, $id_programa, $id_fuente, $id_meta, $id_centro_costos)
-    {
-        // Obtener nombres básicos
-        $categoriaNombre = $this->categoriaModel->find($id_categoria)['nombre_categoria'];
-        $programaNombre = $this->programaModel->find($id_programa)['nombre_programa'];
-        $fuenteNombre = $this->fuenteModel->find($id_fuente)['nombre_fuente'];
-        $metaNombre = $this->metaModel->find($id_meta)['nombre_meta'];
-        $metaCod = $this->metaModel->find($id_meta)['codigo_meta'];
-        $centroNombre = $this->SegCentrocostosModel->find($id_centro_costos)['nombrecen'] ?? 'Centro Desconocido';
+public function ResumenGastos($id_categoria, $id_programa, $id_fuente, $id_meta, $id_centro_costos)
+{
+    // Obtener nombres de cabecera
+    $categoriaNombre = $this->categoriaModel->find($id_categoria)['nombre_categoria'];
+    $programaNombre = $this->programaModel->find($id_programa)['nombre_programa'];
+    $fuenteNombre = $this->fuenteModel->find($id_fuente)['nombre_fuente'];
+    $metaNombre = $this->metaModel->find($id_meta)['nombre_meta'];
+    $metaCod = $this->metaModel->find($id_meta)['codigo_meta'];
+    $centroNombre = $this->SegCentrocostosModel->find($id_centro_costos)['nombrecen'] ?? 'Centro Desconocido';
 
-        // Consulta corregida con filtro efectivo por centro de costos
-        $clasificadores = $this->detalleSeguimientoModel
-            ->select('
-                clasificadores.nombre_clasificador AS detalle,
-                detalle_seguimiento.PIA,
-                SUM(certificados.certificacion_monto) AS certificacion,
-                detalle_seguimiento.PIM_acumulado AS PIM
-            ')
-            ->join('clasificadores', 'clasificadores.id_clasificador = detalle_seguimiento.id_clasificador')
-            ->join('certificados', 'certificados.id_detalle = detalle_seguimiento.id_detalle AND certificados.id_centro_costos = ' . $id_centro_costos, 'left')
-            ->where('detalle_seguimiento.id_categoria', $id_categoria)
-            ->where('detalle_seguimiento.id_programa', $id_programa)
-            ->where('detalle_seguimiento.id_fuente', $id_fuente)
-            ->where('detalle_seguimiento.id_meta', $id_meta)
-            ->groupBy('clasificadores.id_clasificador')
+    // Obtener clasificadores que cumplan el flujo
+    $clasificadores = $this->detalleSeguimientoModel
+        ->select('
+            clasificadores.id_clasificador,
+            clasificadores.nombre_clasificador AS detalle,
+            detalle_seguimiento.id_detalle,
+            detalle_seguimiento.PIA
+        ')
+        ->join('clasificadores', 'clasificadores.id_clasificador = detalle_seguimiento.id_clasificador')
+        ->where('detalle_seguimiento.id_categoria', $id_categoria)
+        ->where('detalle_seguimiento.id_programa', $id_programa)
+        ->where('detalle_seguimiento.id_fuente', $id_fuente)
+        ->where('detalle_seguimiento.id_meta', $id_meta)
+        ->findAll();
+
+    foreach ($clasificadores as &$clasificador) {
+        $idDetalle = $clasificador['id_detalle'];
+
+        // Obtener PIM inicial desde tabla pim_iniciales
+        $pimInicial = $this->pimInicialModel
+            ->join('certificados', 'certificados.id_certificado = pim_iniciales.id_certificado')
+            ->where('certificados.id_detalle', $idDetalle)
+            ->where('pim_iniciales.id_centro_costos', $id_centro_costos)
+            ->select('pim_iniciales.monto_pim')
+            ->first();
+
+        $pimInicial = floatval($pimInicial['monto_pim'] ?? 0);
+
+        // Obtener todos los certificados del clasificador + centro
+        $certificados = $this->certificadosModel
+            ->where('id_detalle', $idDetalle)
+            ->where('id_centro_costos', $id_centro_costos)
+            ->orderBy('fecha', 'ASC')
             ->findAll();
 
-        // Calcular saldos específicos por centro
-        foreach ($clasificadores as &$clasificador) {
-            $clasificador['certificacion'] = $clasificador['certificacion'] ?? 0;
-            $clasificador['saldo'] = $clasificador['PIM'] - $clasificador['certificacion'];
+        // Inicializar con el PIM inicial
+        $PIM_actual = $pimInicial;
+        $Saldo = $pimInicial;
+
+        // Recorrer certificados y aplicar la lógica de cálculo igual que en el frontend
+        foreach ($certificados as $cert) {
+            $modificacion = floatval($cert['modificacion'] ?? 0);
+            $monto        = floatval($cert['certificacion_monto'] ?? 0);
+            $rebaja       = floatval($cert['certificacion_rebaja'] ?? 0);
+            $ampliacion   = floatval($cert['certificacion_ampliacion'] ?? 0);
+
+            $PIM_actual += $modificacion;
+            $Saldo += $modificacion - $monto + ($rebaja - $ampliacion);
         }
 
-        // Preparar datos para la vista
-        $data = [
-            'clasificadores' => $clasificadores,
-            'categoriaNombre' => $categoriaNombre,
-            'programaNombre' => $programaNombre,
-            'fuenteNombre' => $fuenteNombre,
-            'metaNombre' => $metaNombre,
-            'codigo_meta' => $metaCod,
-            'centroNombre' => $centroNombre,
-            'id_centro_costos' => $id_centro_costos
-        ];
-
-        return $this->ViewData('/seguimiento/resumen_gastos', $data, ['scripts' => ['js/seg_resumengastos.js?v=7.1.6']]);
+        // Guardar resultados acumulados
+        $clasificador['PIM'] = $PIM_actual;
+        $clasificador['certificacion'] = $PIM_actual - $Saldo;
+        $clasificador['saldo'] = $Saldo;
     }
 
-    public function verificarPIAClasificador()
-    {
-        $idCategoria = $this->request->getPost('id_categoria');
-        $idPrograma = $this->request->getPost('id_programa');
-        $idFuente = $this->request->getPost('id_fuente');
-        $idMeta = $this->request->getPost('id_meta');
-        $idClasificador = $this->request->getPost('id_clasificador');
+    // Pasar datos a la vista
+    $data = [
+        'clasificadores'   => $clasificadores,
+        'categoriaNombre'  => $categoriaNombre,
+        'programaNombre'   => $programaNombre,
+        'fuenteNombre'     => $fuenteNombre,
+        'metaNombre'       => $metaNombre,
+        'codigo_meta'      => $metaCod,
+        'centroNombre'     => $centroNombre,
+        'id_centro_costos' => $id_centro_costos
+    ];
 
-        // Encuentra el registro específico en detalle_seguimiento
-        $detalle = $this->detalleSeguimientoModel->where([
-            'id_categoria' => $idCategoria,
-            'id_programa' => $idPrograma,
-            'id_fuente' => $idFuente,
-            'id_meta' => $idMeta,
-            'id_clasificador' => $idClasificador
-        ])->first();
+    return $this->ViewData('/seguimiento/resumen_gastos', $data, [
+        'scripts' => ['js/seg_resumengastos.js?v=7.1.6']
+    ]);
+}
 
-        if ($detalle) {
-            return $this->response->setJSON([
-                'pia' => $detalle['PIA'] ?? 0, // Devuelve 0 si PIA es NULL
-                'pim' => $detalle['PIM'] ?? 0, // Devuelve 0 si PIM es NULL
-                'id_detalle' => $detalle['id_detalle']
-            ]);
+
+        public function verificarPIAClasificador()
+        {
+            if ($this->request->isAJAX()) {
+                $id_categoria     = $this->request->getPost('id_categoria');
+                $id_programa      = $this->request->getPost('id_programa');
+                $id_fuente        = $this->request->getPost('id_fuente');
+                $id_meta          = $this->request->getPost('id_meta');
+                $id_clasificador  = $this->request->getPost('id_clasificador');
+                $id_centro_costos = $this->request->getPost('id_centro_costos');
+
+                // Validación básica
+                if (!$id_categoria || !$id_programa || !$id_fuente || !$id_meta || !$id_clasificador || !$id_centro_costos) {
+                    return $this->response->setJSON(['error' => 'Faltan datos requeridos.']);
+                }
+
+                // Obtener PIA desde detalle_seguimiento
+                $detalle = $this->detalleSeguimientoModel->where([
+                    'id_categoria'     => $id_categoria,
+                    'id_programa'      => $id_programa,
+                    'id_fuente'        => $id_fuente,
+                    'id_meta'          => $id_meta,
+                    'id_clasificador'  => $id_clasificador
+                ])->first();
+
+                if (!$detalle) {
+                    return $this->response->setJSON(['error' => 'No se encontró el detalle.']);
+                }
+
+                $pia = $detalle['PIA'];
+
+                // Obtener PIM desde pim_iniciales (relacionado con certificados y el detalle encontrado)
+                    $pim = $this->pimInicialModel
+                        ->join('certificados', 'certificados.id_certificado = pim_iniciales.id_certificado')
+                        ->where('certificados.id_detalle', $detalle['id_detalle']) // <-- esto vincula con clasificador correcto
+                        ->where('pim_iniciales.id_centro_costos', $id_centro_costos)
+                        ->select('pim_iniciales.monto_pim')
+                        ->first();
+
+
+
+                return $this->response->setJSON([
+                    'pia' => $pia,
+                    'pim' => $pim['monto_pim'] ?? 0
+                ]);
+            }
+
+            return $this->response->setJSON(['error' => 'Solicitud inválida.']);
         }
-
-        return $this->response->setJSON(['error' => 'No se encontró un detalle para el clasificador seleccionado']);
-    }
 
     public function obtenerCertificados()
     {

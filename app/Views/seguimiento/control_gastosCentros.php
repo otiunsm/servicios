@@ -85,7 +85,8 @@
                                 </div>
                                 <div class="form-group d-flex flex-column align-items-center">
                                     <h10 class="mr-3 mb-0">PIM - INICIAL:</h10>
-                                    <input type="text" class="form-control" name="pim" style="width: 120px;" readonly />
+                                <input type="text" class="form-control" name="pim" style="width: 120px;" readonly />
+
                                 </div>
                             </div>
 
@@ -200,12 +201,13 @@
             // Oculta el contenido antes de realizar la verificación
             $('#contenidoPantalla').show();
 
-            $.post("<?= base_url('SegCarpetas/verificarPIAClasificador') ?>", {
+            $.post("<?= base_url('SegDesglose/verificarPIAClasificador') ?>", {
                 id_categoria: categoriaId,
                 id_programa: programaId,
                 id_fuente: fuenteId,
                 id_meta: metaId,
-                id_clasificador: clasificadorId
+                id_clasificador: clasificadorId,
+                id_centro_costos: id_centro_costos
             }, function(response) {
                 if (response.error) {
                     alert(response.error);
@@ -217,6 +219,7 @@
 
                 // Asignar el valor del PIM al input correspondiente
                 $('input[name="pim"]').val(response.pim || '');
+
             });
 
             /////////////////

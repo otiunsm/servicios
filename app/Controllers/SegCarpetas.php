@@ -9,6 +9,7 @@ use App\Models\SegClasificadorModel;
 use App\Models\SegDetalleSeguimientoModel;
 use App\Models\SegFuenteFinanciamientoModel;
 use App\Models\SegMetaModel;
+use App\Models\SegPimInicial;
 use App\Models\SegProgramaPresupuestalModel;
 use CodeIgniter\Controller;
 use App\Models\SegCentrocostosModel;
@@ -24,6 +25,7 @@ class SegCarpetas extends Controller
     protected $clasificadoresModel;
     protected $certificadosModel;
     protected $SegCentrocostosModel;
+    protected $SegPimInicialmodel;
 
     public function __construct()
     {
@@ -36,6 +38,7 @@ class SegCarpetas extends Controller
         $this->clasificadoresModel = new SegClasificadorModel();
         $this->certificadosModel = new SegCertificadosModel();
         $this->SegCentrocostosModel = new SegCentrocostosModel();
+        $this->SegPimInicialmodel = new SegPimInicial();
     }
 
     public function crearPrograma()
@@ -481,9 +484,21 @@ class SegCarpetas extends Controller
             $idCentro = $this->request->getPost('idCentro');
 
             // Verifica los datos requeridos
-            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador) {
+            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador || !$idCentro ) {
                 return $this->response->setJSON(['success' => false, 'message' => 'Faltan datos.']);
             }
+
+                    // Validar que exista una Nota Modificatoria registrada en pim_iniciales
+                    $existeNota = $this->SegPimInicialmodel
+                        ->where('id_centro_costos', $idCentro)
+                        ->countAllResults();
+
+                    if ($existeNota == 0) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'No se puede registrar un certificado para este centro de costo porque aún no tiene una Nota Modificatoria registrada.'
+                        ]);
+                    }
 
             // Busca el detalle correspondiente
             $detalle = $this->detalleSeguimientoModel->where([
@@ -564,7 +579,7 @@ class SegCarpetas extends Controller
             $idClasificador = $this->request->getPost('id_clasificador');
             $idCentro = $this->request->getPost('idCentro');
 
-            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador) {
+            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador || !$idCentro ) {
                 return $this->response->setJSON(['success' => false, 'message' => 'Faltan datos.']);
             }
             $detalle = $this->detalleSeguimientoModel->where([
@@ -592,10 +607,29 @@ class SegCarpetas extends Controller
                 'id_centro_costos' => $idCentro ? $idCentro : null
             ];
 
-            $this->certificadosModel->crearCertificado($data);
+            $montoModificacion = $this->request->getPost('notadinero');
 
-            return $this->response->setJSON(['success' => true]);;
+            if($this->certificadosModel->crearCertificado($data)){
+                                $idCertificado = $this->certificadosModel->insertID();
+
+                // Verificar si ya existe un PIM inicial para este centro de costo
+                $existe = $this->SegPimInicialmodel->where('id_centro_costos', $idCentro)->countAllResults();
+
+                if ($existe == 0) {
+                    // Guardar PIM inicial si es la primera vez
+                    $this->SegPimInicialmodel->insert([
+                        'id_certificado' => $idCertificado,
+                        'id_centro_costos' => $idCentro,
+                        'monto_pim' => $montoModificacion
+                    ]);
+                }
+
+            return $this->response->setJSON(['success' => true]);
+            }else {
+                return $this->response->setJSON(['success' => false, 'message' => 'Error al guardar en la base de datos.']);}
+                    
         }
+
 
         return $this->response->setJSON(['status' => 'error', 'message' => 'Método de solicitud no válido.']);
     }
