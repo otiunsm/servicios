@@ -70,6 +70,18 @@
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
+                                            <!--end:bobotones de eitar y eliminar:Row-->
+                                            <div class="d-flex justify-content-between mt-3">
+                                            <button class="btn btn-warning btn-sm btn-editar-carpeta" data-id="<?= $carpeta['id_carpeta'] ?>" data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>" data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <!-- Botón para eliminar con SweetAlert2 -->
+                                            <button class="btn btn-danger btn-sm btn-confirmar-eliminar" data-id="<?= $carpeta['id_carpeta'] ?>">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                            </button>
+
+                                            </div>
+                                             <!--end:bobotones de eitar y eliminar:Row-->
                                             <p class="card-text"><strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?></p>
                                             <p class="card-text"><strong>Descripción:</strong> <?= esc($carpeta['descripcion'] ?? 'Sin descripción') ?></p>
                                             <a href="<?= base_url("SegCarpetas/listarFuentes/{$carpeta['id_carpeta']}/{$carpeta['id_categoria']}/{$carpeta['id_programa']}") ?>" class="btn btn-primary btn-block">
@@ -93,6 +105,8 @@
         <!--end::Container-->
     </div>
     <!--end::Entry-->
+
+    
 </div>
 
 <!-- Modal para Crear Carpeta de Programa -->
@@ -147,6 +161,61 @@
     </div>
 </div>
 <!--end::Content-->
+<!-- Modal para editar carpeta -->
+
+
+<!-- Modal para editar carpeta -->
+<div class="modal fade" id="modalEditarCarpeta" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="formEditarCarpeta">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Carpeta</h5>
+          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id_carpeta" id="editar_id_carpeta">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" class="form-control" name="nombre_carpeta" id="editar_nombre">
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea class="form-control" name="descripcion" id="editar_descripcion"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmación de Eliminación -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar esta carpeta?
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="eliminar_id">
+        <button type="button" class="btn btn-danger" id="confirmarEliminar">Sí, eliminar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 <style>
     .folder-card {
         border: 1px solid #e0e0e0;
@@ -204,5 +273,59 @@
 
 <script>
     const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+    
+    $(document).on('click', '.btn-editar-carpeta', function () {
+    $('#editar_id_carpeta').val($(this).data('id'));
+    $('#editar_nombre').val($(this).data('nombre'));
+    $('#editar_descripcion').val($(this).data('descripcion'));
+    $('#modalEditarCarpeta').modal('show');
+});
+
+$('#formEditarCarpeta').submit(function (e) {
+    
+    $.post(BASE_URL + 'SegCarpetas/editarCarpeta', $(this).serialize(), function (res) {
+        $('#modalEditarCarpeta').modal('hide');
+        showToast(res.message, res.success);
+        if (res.success) setTimeout(() => location.reload(), 2000);
+    });
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.btn-confirmar-eliminar').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.getAttribute('data-id');
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción eliminará la carpeta',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+      }).then(result => {
+        if (result.isConfirmed) {
+          // Crear y enviar formulario dinámico
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '<?= base_url('SegCarpetas/eliminarCarpeta') ?>';
+
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'id_carpeta';
+          input.value = id;
+          form.appendChild(input);
+
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+});
+
+
+
 </script>
 

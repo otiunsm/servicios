@@ -82,6 +82,13 @@
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
+
+                                            <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditarMeta_<?= $carpeta['id_carpeta'] ?>">
+                                            <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <button class="btn btn-danger btn-sm btn-confirmar-eliminar-meta" data-id="<?= $carpeta['id_carpeta'] ?>">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                            </button>
                                             <p class="card-text">
                                                 <strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?><br>
                                                 <strong>Fuente:</strong> <?= esc($carpeta['nombre_fuente']) ?><br>
@@ -103,6 +110,35 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Modal para editar meta -->
+<div class="modal fade" id="modalEditarMeta_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaMeta') ?>">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Meta</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
+          <div class="form-group">
+            <label>Nombre Meta</label>
+            <input type="text" class="form-control" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea class="form-control" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="col-12">
@@ -173,6 +209,8 @@
     </div>
 </div>
 
+
+
 <style>
     .folder-card {
         border: 1px solid #e0e0e0;
@@ -230,4 +268,39 @@
 
 <script>
     const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.btn-confirmar-eliminar-meta').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.getAttribute('data-id');
+
+      Swal.fire({
+        title: '¿Deseas eliminar esta meta?',
+        text: 'Esta acción eliminará permanentemente la carpeta meta si no tiene clasificadores con PIA distinto de 0.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+      }).then(result => {
+        if (result.isConfirmed) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '<?= base_url('SegCarpetas/eliminarCarpetaMeta') ?>';
+
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'id_carpeta';
+          input.value = id;
+
+          form.appendChild(input);
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+});
 </script>

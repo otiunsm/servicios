@@ -71,6 +71,16 @@
                                             <h5 class="card-title mt-2"><?= $desglose['nombre_desglose'] ?></h5>
                                         </div>
                                         <div class="card-body">
+<button class="btn btn-warning btn-sm"
+        data-toggle="modal"
+        data-target="#modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>">
+  <i class="fas fa-edit"></i> Editar
+</button>
+
+<button class="btn btn-danger btn-sm btn-confirmar-eliminar-fuente" >
+  <i class="fas fa-trash"></i> Eliminar
+</button>
+
                                             <p class="card-text">
                                                 <strong>Categoria:</strong> <?= $desglose['nombre_categoria'] ?> <br>
                                                 <strong>Programa:</strong> <?= $desglose['nombre_programa'] ?> <br>
@@ -165,6 +175,38 @@
             </form>
         </div>
     </div>
+</div>
+
+<div class="modal fade"
+     id="modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>"
+     tabindex="-1" role="dialog">
+
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post" action="<?= base_url('SegDesglose/editarDesglose') ?>">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Desglose</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+
+          <?php foreach (['id_categoria','id_programa','id_fuente','id_meta','id_centro_costos'] as $campo): ?>
+            <input type="hidden" name="<?= $campo ?>" value="<?= $desglose[$campo] ?>">
+          <?php endforeach; ?>
+
+          <div class="form-group">
+            <label>Nombre Desglose</label>
+            <input type="text" class="form-control" name="nombre_desglose" value="<?= esc($desglose['nombre_desglose']) ?>" required>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 

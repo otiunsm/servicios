@@ -75,6 +75,7 @@
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
+
                                             <p class="card-text"><strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?></p>
                                             <p class="card-text"><strong>Fuente:</strong> <?= esc($carpeta['nombre_fuente']) ?></p>
                                             <p class="card-text"><strong>Descripción:</strong> <?= esc($carpeta['descripcion'] ?? 'Sin descripción') ?></p>
@@ -82,6 +83,18 @@
                                             <a href="<?= base_url("SegCarpetas/listarMetas/{$carpeta['id_carpeta']}/{$carpeta['id_categoria']}/{$carpeta['id_programa']}/{$carpeta['id_fuente']}") ?>" class="btn btn-primary btn-block">
                                                 <i class="fas fa-eye"></i>Ver Metas
                                             </a>
+
+                                            <div class="btn-group mt-2">
+                                                <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditarFuente_<?= $carpeta['id_carpeta'] ?>">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm btn-confirmar-eliminar-fuente" data-id="<?= $carpeta['id_carpeta'] ?>">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </div>
+
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -147,6 +160,35 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalEditarFuente_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaFuente') ?>">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Fuente</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
+          <div class="form-group">
+            <label>Nombre de la carpeta</label>
+            <input type="text" class="form-control" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea class="form-control" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
 <style>
     .folder-card {
         border: 1px solid #e0e0e0;
@@ -205,5 +247,40 @@
 
 <script>
     const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.btn-confirmar-eliminar-fuente').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.getAttribute('data-id');
+      Swal.fire({
+        title: '¿Deseas eliminar esta fuente?',
+        text: 'Esta acción eliminará permanentemente la carpeta fuente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+      }).then(result => {
+        if (result.isConfirmed) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '<?= base_url('SegCarpetas/eliminarCarpetaFuente') ?>';
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'id_carpeta';
+          input.value = id;
+          form.appendChild(input);
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+});
+
+
 </script>
 

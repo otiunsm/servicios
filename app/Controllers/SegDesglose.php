@@ -445,4 +445,38 @@ public function ResumenGastos($id_categoria, $id_programa, $id_fuente, $id_meta,
         
 
     }
+
+
+public function editarDesglose()
+{
+    $where = [
+        'id_categoria' => $this->request->getPost('id_categoria'),
+        'id_programa' => $this->request->getPost('id_programa'),
+        'id_fuente' => $this->request->getPost('id_fuente'),
+        'id_meta' => $this->request->getPost('id_meta'),
+        'id_centro_costos' => $this->request->getPost('id_centro_costos'),
+    ];
+
+    $data = [
+        'nombre_desglose' => $this->request->getPost('nombre_desglose')
+    ];
+
+    if ($this->desgloseModel->where($where)->set($data)->update()) {
+        session()->setFlashdata('AlertShow', [
+            'Tipo' => 'success',
+            'Mensaje' => 'Desglose actualizado correctamente.'
+        ]);
+    } else {
+        session()->setFlashdata('AlertShow', [
+            'Tipo' => 'error',
+            'Mensaje' => 'Error al actualizar el desglose.'
+        ]);
+    }
+
+    return redirect()->back();
+}
+
+
+
+
 }

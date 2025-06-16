@@ -71,7 +71,7 @@ class SegCarpetas extends Controller
             'id_programa' => $idPrograma, // Puede ser null
             'id_fuente' => null, // No aplica para carpetas de programa
             'id_meta' => null, // No aplica para carpetas de programa
-            'id_clasificador' => null, // No aplica para carpetas de programa
+            //'id_clasificador' => null, // No aplica para carpetas de programa
             'estado' => 1,
         ];
         $this->carpetaModel->insert($dataCarpeta);
@@ -724,4 +724,158 @@ class SegCarpetas extends Controller
 
         return $this->response->setJSON($carpetas);
     }
+
+    //boton eliminar y editar
+    public function editarCarpeta()
+{
+    $idCarpeta = $this->request->getPost('id_carpeta');
+    $data = [
+        'nombre_carpeta' => $this->request->getPost('nombre_carpeta'),
+        'descripcion' => $this->request->getPost('descripcion'),
+    ];
+
+    if ($this->carpetaModel->update($idCarpeta, $data)) {
+      session()->setFlashdata('AlertShow', ["Tipo" => 'success', "Mensaje" => "Carpeta actualizada correctamente."]);
+    } else {
+          session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo actualizar la carpeta."]);
+    }
+    return redirect()->to(base_url() . "/SegCarpetas");
+}
+
+public function eliminarCarpeta()
+{
+    $idCarpeta = $this->request->getPost('id_carpeta');
+
+    $tieneHijos = $this->carpetaModel->where('id_carpeta_padre', $idCarpeta)->countAllResults();
+    if ($tieneHijos > 0) {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'warning', "Mensaje" => "No se puede eliminar: contiene subcarpetas."]);
+        return redirect()->to(base_url() . "/SegCarpetas");
+    }
+
+    if ($this->carpetaModel->delete($idCarpeta)) {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'success', "Mensaje" => "Carpeta eliminada correctamente."]);
+    } else {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo eliminar la carpeta."]);
+    }
+    return redirect()->to(base_url() . "/SegCarpetas");
+
+    
+}
+
+public function editarCarpetaFuente()
+{
+    $id = $this->request->getPost('id_carpeta');
+    $data = [
+        'nombre_carpeta' => $this->request->getPost('nombre_carpeta'),
+        'descripcion' => $this->request->getPost('descripcion'),
+    ];
+
+    if ($this->carpetaModel->update($id, $data)) {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'success', "Mensaje" => "Carpeta fuente actualizada correctamente."]);
+    } else {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo actualizar la carpeta fuente."]);
+    }
+
+    return redirect()->back();
+}
+
+public function eliminarCarpetaFuente()
+{
+    $id = $this->request->getPost('id_carpeta');
+    $tieneHijos = $this->carpetaModel->where('id_carpeta_padre', $id)->countAllResults();
+
+    if ($tieneHijos > 0) {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'warning', "Mensaje" => "No se puede eliminar: contiene subcarpetas."]);
+    } else {
+        if ($this->carpetaModel->delete($id)) {
+            session()->setFlashdata('AlertShow', ["Tipo" => 'success', "Mensaje" => "Carpeta fuente eliminada correctamente."]);
+        } else {
+            session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo eliminar la carpeta fuente."]);
+        }
+    }
+
+    return redirect()->back();
+}
+
+public function editarCarpetaMeta()
+{
+    $id = $this->request->getPost('id_carpeta');
+
+    $data = [
+        'nombre_carpeta' => $this->request->getPost('nombre_carpeta'),
+        'descripcion'    => $this->request->getPost('descripcion'),
+    ];
+
+    if ($this->carpetaModel->update($id, $data)) {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'success',
+            "Mensaje" => "Carpeta meta actualizada correctamente."
+        ]);
+    } else {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'error',
+            "Mensaje" => "No se pudo actualizar la carpeta meta."
+        ]);
+    }
+
+    return redirect()->back();
+}
+
+public function eliminarCarpetaMeta()
+{
+    $idCarpetaMeta = $this->request->getPost('id_carpeta');
+
+    // Obtener los datos de la carpeta (para recuperar los identificadores)
+    $carpeta = $this->carpetaModel->find($idCarpetaMeta);
+
+    if (!$carpeta) {
+        session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "Carpeta no encontrada."]);
+        return redirect()->back();
+    }
+
+    // Validar que no haya clasificadores con PIA > 0 en esta combinación
+    $tienePIA = $this->detalleSeguimientoModel
+        ->where('id_categoria', $carpeta['id_categoria'])
+        ->where('id_programa', $carpeta['id_programa'])
+        ->where('id_fuente', $carpeta['id_fuente'])
+        ->where('id_meta', $carpeta['id_meta'])
+        ->where('PIA >', 0)
+        ->countAllResults();
+
+    if ($tienePIA > 0) {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'warning',
+            "Mensaje" => "No se puede eliminar esta carpeta meta porque contiene clasificadores con PIA mayor a 0."
+        ]);
+        return redirect()->back();
+    }
+
+    // Verificar subcarpetas
+    $tieneHijos = $this->carpetaModel->where('id_carpeta_padre', $idCarpetaMeta)->countAllResults();
+    if ($tieneHijos > 0) {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'warning',
+            "Mensaje" => "No se puede eliminar: contiene subcarpetas."
+        ]);
+        return redirect()->back();
+    }
+
+    // Eliminar la carpeta si pasa las validaciones
+    if ($this->carpetaModel->delete($idCarpetaMeta)) {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'success',
+            "Mensaje" => "Carpeta meta eliminada correctamente."
+        ]);
+    } else {
+        session()->setFlashdata('AlertShow', [
+            "Tipo" => 'error',
+            "Mensaje" => "Error al eliminar la carpeta meta."
+        ]);
+    }
+
+    return redirect()->back();
+}
+
+
+
 }
