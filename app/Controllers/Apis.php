@@ -16,17 +16,23 @@ class Apis extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_SSL_VERIFYPEER => false,  // desactiva temporalmente verificación SSL
+    CURLOPT_SSL_VERIFYHOST => false,  // desactiva temporalmente verificación del host
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json'
+    ]
         ]);
 
         $response = curl_exec($curl);
-        
-        if (curl_errno($curl)) {
-            $error_msg = curl_error($curl);
-            curl_close($curl);
-            throw new Exception("cURL Error: $error_msg");
-        }
-        
-        curl_close($curl);
+
+if (curl_errno($curl)) {
+    $error_msg = curl_error($curl);
+    curl_close($curl);
+    throw new \Exception("cURL Error: $error_msg");
+}
+
+curl_close($curl);
+
         return $response;
     }
     
