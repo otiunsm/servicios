@@ -67,21 +67,24 @@
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
                                             <i class="fas fa-folder fa-3x text-warning"></i>
+                                            
+        <!-- Íconos en la esquina superior derecha -->
+        <div class="icon-actions">
+            <a href="javascript:void(0);" class="text-warning btn-editar-carpeta" 
+               data-id="<?= $carpeta['id_carpeta'] ?>" 
+               data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>" 
+               data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
+               <i class="fas fa-edit"></i>
+            </a>
+            <a href="javascript:void(0);" class="text-danger btn-confirmar-eliminar" 
+               data-id="<?= $carpeta['id_carpeta'] ?>">
+               <i class="fas fa-trash-alt"></i>
+            </a>
+        </div>
+
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
-                                            <!--end:bobotones de eitar y eliminar:Row-->
-                                            <div class="d-flex justify-content-between mt-3">
-                                            <button class="btn btn-warning btn-sm btn-editar-carpeta" data-id="<?= $carpeta['id_carpeta'] ?>" data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>" data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </button>
-                                            <!-- Botón para eliminar con SweetAlert2 -->
-                                            <button class="btn btn-danger btn-sm btn-confirmar-eliminar" data-id="<?= $carpeta['id_carpeta'] ?>">
-                                            <i class="fas fa-trash-alt"></i> Eliminar
-                                            </button>
-
-                                            </div>
-                                             <!--end:bobotones de eitar y eliminar:Row-->
                                             <p class="card-text"><strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?></p>
                                             <p class="card-text"><strong>Descripción:</strong> <?= esc($carpeta['descripcion'] ?? 'Sin descripción') ?></p>
                                             <a href="<?= base_url("SegCarpetas/listarFuentes/{$carpeta['id_carpeta']}/{$carpeta['id_categoria']}/{$carpeta['id_programa']}") ?>" class="btn btn-primary btn-block">
@@ -267,7 +270,27 @@
     .folder-card .btn-primary:hover {
         background-color: #0056b3;
         border-color: #004085;
+        
     }
+    .icon-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.icon-actions a {
+    margin-left: 8px;
+    font-size: 16px;
+    text-decoration: none;
+}
+.icon-actions i.fa-edit {
+    color:rgb(58, 53, 204); /* naranja */
+}
+
+.icon-actions i.fa-trash-alt {
+    color: #d9534f; /* rojo */
+}
+
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

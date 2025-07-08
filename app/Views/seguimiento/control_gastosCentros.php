@@ -214,11 +214,52 @@
                     return;
                 }
 
-                // Asignar el valor del PIA al input correspondiente
-                $('input[name="pia"]').val(response.pia || '');
+           $('input[name="pia"]').val(response.pia || '');
+$('input[name="pim"]').val(response.pim || '');
 
-                // Asignar el valor del PIM al input correspondiente
-                $('input[name="pim"]').val(response.pim || '');
+if (response.editable) {
+    $('input[name="pia"]').prop('readonly', false);
+    $('input[name="pim"]').prop('readonly', false);
+
+    if ($('#btnGuardarInicial').length === 0) {
+        $('#contenidoPantalla .row').first().append(`
+            <div class="col-md-2 mt-4">
+                <button id="btnGuardarInicial" class="btn btn-outline-primary btn-sm">Guardar Inicialización</button>
+            </div>
+        `);
+    }
+
+    $('#btnGuardarInicial').off('click').on('click', function () {
+        const valor_pia = $('input[name="pia"]').val();
+        const valor_pim = $('input[name="pim"]').val();
+
+        $.post("<?= base_url('SegDesglose/guardarInicializacion') ?>", {
+            id_categoria: categoriaId,
+            id_programa: programaId,
+            id_fuente: fuenteId,
+            id_meta: metaId,
+            id_clasificador: clasificadorId,
+            id_centro_costos: id_centro_costos,
+            valor_pia,
+            valor_pim
+        }, function (resp) {
+            if (resp.success) {
+                toastr.success("Inicialización guardada correctamente");
+                $('input[name="pia"]').prop('readonly', true);
+                $('input[name="pim"]').prop('readonly', true);
+                $('#btnGuardarInicial').hide();
+            } else {
+                toastr.error("Error al guardar inicialización");
+            }
+        });
+    });
+
+} else {
+    $('input[name="pia"]').prop('readonly', true);
+    $('input[name="pim"]').prop('readonly', true);
+    $('#btnGuardarInicial').remove();
+}
+
 
             });
 

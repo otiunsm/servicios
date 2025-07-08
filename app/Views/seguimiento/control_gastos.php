@@ -162,7 +162,7 @@
                                 <input type="text" class="form-control" name="certificado" placeholder="Ingresar código de certificado" required />
                             </div>
                             <div class="form-group">
-                                <label>Centro de Costo (Opcional)</label>
+                                <label>Centro de Costo <span class="text-danger">*</span></label>
                                 <select class="selectpicker form-control" data-live-search="true" id="idCentro" name="idCentros" title="Elije centro de costo">
                                     <?php foreach ($SegCentrocostos as $centrocosto): ?>
                                         <option value="<?= $centrocosto['idCentro'] ?>"><?= esc($centrocosto['nombrecen']) ?></option>
@@ -224,10 +224,11 @@
                             <input type="hidden" name="id_clasificador">
                             <input type="hidden" name="id_certificado">
                             <input type="hidden" name="mode" value="create">
+                            <input type="hidden" name="forzarPIMInicial" value="0">
 
                             <div class="form-group">
-                                <label>Centro de Costo (Opcional)</label>
-                                <select class="selectpicker form-control" data-live-search="true" id="idCentro" name="idCentritos" title="Elije centro de costo">
+                                <label>Centro de Costo <span class="text-danger">*</span></label>
+                                <select class="selectpicker form-control" data-live-search="true" id="idCentro" name="idCentro" title="Elije centro de costo">
                                     <?php foreach ($SegCentrocostos as $centrocosto): ?>
                                         <option value="<?= $centrocosto['idCentro'] ?>"><?= esc($centrocosto['nombrecen']) ?></option>
                                     <?php endforeach; ?>
@@ -256,28 +257,49 @@
 
 
 <!-- Modal para ingreso de PIA -->
+<!-- Modal para ingreso o derivación de PIA -->
 <div class="modal fade" id="piaModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ingresar PIA</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="piaForm" method="post" action="<?= base_url('SegCarpetas/actualizarPIA') ?>">
-                    <input type="hidden" id="inputDetalle" name="id_detalle">
-                    <input type="number" id="inputPIA" name="pia" class="form-control" placeholder="Ingrese el valor de PIA" required>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" form="piaForm" class="btn btn-primary">Guardar</button>
-                <button type="button" class="btn btn-secondary" id="cancelButton" data-dismiss="modal">Cancelar</button>
-            </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¿Cómo desea registrar el PIA?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="inputDetalle" name="id_detalle">
+        <input type="hidden" id="categoriaPIA">
+        <input type="hidden" id="programaPIA">
+        <input type="hidden" id="fuentePIA">
+        <input type="hidden" id="metaPIA">
+        <input type="hidden" id="clasificadorPIA">
+        <input type="hidden" name="forzarPIMInicial" value="0">
+
+
+        <div class="form-group">
+          <label>Seleccione una opción:</label>
+          <select id="tipoIngresoPIA" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="directo">Ingresar PIA manualmente</option>
+            <option value="nota">Registrar Nota Modificatoria</option>
+          </select>
         </div>
+
+        <div class="form-group" id="grupoInputPIA" style="display:none;">
+          <input type="number" id="inputPIA" class="form-control" placeholder="Ingrese el valor del PIA">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="guardarPIAOpcion" class="btn btn-primary">Continuar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
     </div>
+  </div>
 </div>
+
 
 
 <script>
@@ -322,141 +344,137 @@
 
 
 
-    $(document).ready(function() {
-        $('#clasificadores').change(function() {
-            const clasificadorId = $(this).val();
-            if (!clasificadorId) return;
+$(document).ready(function() {
+    $('#clasificadores').change(function() {
+        const clasificadorId = $(this).val();
+        if (!clasificadorId) return;
 
-            // Obtiene el nombre del clasificador seleccionado desde el atributo data-nombre
-            const clasificadorNombre = $(this).find('option:selected').data('nombre');
+        const clasificadorNombre = $(this).find('option:selected').data('nombre');
+        $('input[name="clasificadorNombre"]').val(clasificadorNombre);
 
-            // Asigna el nombre al campo correspondiente en la vista
-            $('input[name="clasificadorNombre"]').val(clasificadorNombre);
+        const categoriaId = '<?= $id_categoria ?>';
+        const programaId = '<?= $id_programa ?>';
+        const fuenteId = '<?= $id_fuente ?>';
+        const metaId = '<?= $id_meta ?>';
 
-            // Aquí están los datos de programa, fuente, y meta que vienen de la otra pantalla
-            const categoriaId = '<?= $id_categoria ?>';
-            const programaId = '<?= $id_programa ?>';
-            const fuenteId = '<?= $id_fuente ?>';
-            const metaId = '<?= $id_meta ?>';
+        $('input[name="id_categoria"]').val(categoriaId);
+        $('input[name="id_programa"]').val(programaId);
+        $('input[name="id_fuente"]').val(fuenteId);
+        $('input[name="id_meta"]').val(metaId);
+        $('input[name="id_clasificador"]').val(clasificadorId);
 
-            $('input[name="id_categoria"]').val(categoriaId);
-            $('input[name="id_programa"]').val(programaId);
-            $('input[name="id_fuente"]').val(fuenteId);
-            $('input[name="id_meta"]').val(metaId);
-            $('input[name="id_clasificador"]').val(clasificadorId);
+        $('#contenidoPantalla').hide();
 
-            // Oculta el contenido antes de realizar la verificación
-            $('#contenidoPantalla').hide();
+        $.post("<?= base_url('SegCarpetas/verificarPIAClasificador') ?>", {
+            id_categoria: categoriaId,
+            id_programa: programaId,
+            id_fuente: fuenteId,
+            id_meta: metaId,
+            id_clasificador: clasificadorId
+        }, function(response) {
+            if (response.error) {
+                alert(response.error);
+                return;
+            }
 
-            // Consulta al servidor para verificar el PIA del clasificador seleccionado
-            $.post("<?= base_url('SegCarpetas/verificarPIAClasificador') ?>", {
-                id_categoria: categoriaId,
-                id_programa: programaId,
-                id_fuente: fuenteId,
-                id_meta: metaId,
-                id_clasificador: clasificadorId
-            }, function(response) {
-                if (response.error) {
-                    alert(response.error);
-                    return;
+            $('input[name="pia"]').val(response.pia || '');
+            $('input[name="pim"]').val(response.pim || '');
+
+            if (response.pia <= 0 && response.pim == 0.00) {
+                $('#inputDetalle').val(response.id_detalle);
+                $('#categoriaPIA').val(categoriaId);
+                $('#programaPIA').val(programaId);
+                $('#fuentePIA').val(fuenteId);
+                $('#metaPIA').val(metaId);
+                $('#clasificadorPIA').val(clasificadorId);
+                $('#piaModal').modal('show');
+            } else {
+                $('#contenidoPantalla').show();
+            }
+        });
+
+        // Obtener certificados
+        $.post("<?= base_url('SegCarpetas/obtenerCertificados') ?>", {
+            id_categoria: categoriaId,
+            id_programa: programaId,
+            id_fuente: fuenteId,
+            id_meta: metaId,
+            id_clasificador: clasificadorId,
+        }, function(response) {
+            const table = $('#kt_datatable').DataTable();
+            table.clear();
+
+            let pimInicial = parseFloat(document.getElementsByName("pim")[0]?.value || 0);
+            let saldo = pimInicial;
+            let PIM_acumulado = 0;
+            let certificado_acumulado = 0;
+
+            // Detectar ID del certificado inicial si existe
+            const pimInicialCert = response.find(c => parseFloat(c.modificacion) === pimInicial);
+            const idInicial = pimInicialCert ? pimInicialCert.id_certificado : null;
+
+            response.forEach((certificado, index) => {
+                let modif = parseFloat(certificado.modificacion) || 0;
+                let monto = parseFloat(certificado.certificacion_monto) || 0;
+                let rebaja = parseFloat(certificado.certificacion_rebaja) || 0;
+                let ampliacion = parseFloat(certificado.certificacion_ampliacion) || 0;
+
+                let esPIMInicial = (certificado.id_certificado === idInicial);
+
+                let pim = esPIMInicial ? pimInicial : pimInicial + modif;
+                saldo = esPIMInicial ? pimInicial : saldo + modif - monto + (rebaja - ampliacion);
+
+                if (!esPIMInicial) pimInicial = pim; // Acumular solo si no es el inicial
+
+                if (index === response.length - 1) {
+                    PIM_acumulado = pim;
+                    certificado_acumulado = pim - saldo;
                 }
 
-                // Asignar el valor del PIA al input correspondiente
-                $('input[name="pia"]').val(response.pia || '');
-
-                // Asignar el valor del PIM al input correspondiente
-                $('input[name="pim"]').val(response.pim || '');
-
-                // Verificar si el PIA está vacío (0 o NULL) y mostrar el modal
-                if (!response.pia || response.pia == 0) {
-                    // Si el PIA es 0 o NULL, abre el modal
-                    $('#inputDetalle').val(response.id_detalle);
-                    $('#piaModal').modal('show');
-                } else {
-                    // Si el PIA tiene un valor válido, muestra el contenido
-                    $('#contenidoPantalla').show();
-                }
+                table.row.add([
+                    certificado.codigo_transaccion || "",
+                    certificado.fecha,
+                    certificado.detalle,
+                    modif,
+                    pim,
+                    monto,
+                    rebaja,
+                    ampliacion,
+                    saldo,
+                    `<button class="btn btn-sm" onclick="editarCertificado('${certificado.id_certificado}', '${certificado.codigo_transaccion}', '${certificado.detalle || ""}', ${modif}, ${monto}, ${rebaja}, ${ampliacion}, '${certificado.id_centro_costos || 'null'}')">
+                        <i class="fas fa-edit text-success"></i>
+                    </button>
+                    <button class="btn btn-sm" onclick="eliminarCertificado(${certificado.id_certificado})">
+                        <i class="fas fa-trash-alt text-danger"></i>
+                    </button>`
+                ]);
             });
 
-            /////////////////
-            $.post("<?= base_url('SegCarpetas/obtenerCertificados') ?>", {
-                id_categoria: categoriaId,
-                id_programa: programaId,
-                id_fuente: fuenteId,
-                id_meta: metaId,
-                id_clasificador: clasificadorId,
-            }, function(response) {
-                // Limpia la tabla antes de llenarla con nuevos datos
+            table.order([1, 'asc']);
+            table.draw();
 
-                const table = $('#kt_datatable').DataTable();
-                table.clear();
-
-                let previousPIM = parseFloat(document.getElementsByName("pim")[0]?.value || "");
-                let previousSaldo = parseFloat(document.getElementsByName("pim")[0]?.value || "");
-                let PIM_acumulado = 0; // Para almacenar el último valor de PIM
-                let certificado_acumulado = 0; // Para almacenar la resta del último PIM - Saldo
-
-                response.forEach((certificado, index) => {
-                    let modificacion = parseFloat(certificado.modificacion) || 0;
-                    let monto = parseFloat(certificado.certificacion_monto) || 0;
-                    let rebaja = parseFloat(certificado.certificacion_rebaja) || 0;
-                    let ampliacion = parseFloat(certificado.certificacion_ampliacion) || 0;
-
-                    PIM = previousPIM + modificacion;
-                    Saldo = previousSaldo + modificacion - monto + (rebaja - ampliacion);
-                    previousPIM = PIM;
-                    previousSaldo = Saldo;
-
-                    if (index === response.length - 1) {
-                        PIM_acumulado = PIM;
-                        certificado_acumulado = PIM - Saldo;
+            // Guardar acumulados
+            $.ajax({
+                url: "<?= base_url('SegCarpetas/guardarAcumulados') ?>",
+                type: "POST",
+                data: {
+                    id_categoria: categoriaId,
+                    id_programa: programaId,
+                    id_fuente: fuenteId,
+                    id_meta: metaId,
+                    id_clasificador: clasificadorId,
+                    PIM_acumulado: PIM_acumulado,
+                    certificado_acumulado: certificado_acumulado
+                },
+                success: function(response) {
+                    if (!response.success) {
+                        alert(response.message);
                     }
-
-                    table.row.add([
-                        certificado.codigo_transaccion || "",
-                        certificado.fecha,
-                        certificado.detalle,
-                        modificacion,
-                        PIM,
-                        monto,
-                        rebaja,
-                        ampliacion,
-                        Saldo,
-                        `<button class="btn btn-sm" onclick="editarCertificado('${certificado.id_certificado}', '${certificado.codigo_transaccion}', '${certificado.detalle || ""}', ${modificacion}, ${monto}, ${rebaja}, ${ampliacion}, '${certificado.id_centro_costos || 'null'}')">
-                            <i class="fas fa-edit text-success"></i>
-                        </button>
-                        <button class="btn btn-sm" onclick="eliminarCertificado(${certificado.id_certificado})">
-                            <i class="fas fa-trash-alt text-danger"></i>
-                        </button>`
-                    ]);
-                });
-                table.order([1, 'asc']);
-                table.draw();
-
-                // Actualizar los valores en la base de datos
-                $.ajax({
-                    url: "<?= base_url('SegCarpetas/guardarAcumulados') ?>",
-                    type: "POST",
-                    data: {
-                        id_categoria: categoriaId,
-                        id_programa: programaId,
-                        id_fuente: fuenteId,
-                        id_meta: metaId,
-                        id_clasificador: clasificadorId,
-                        PIM_acumulado: previousPIM, // Último PIM calculado
-                        certificado_acumulado: previousPIM - previousSaldo // Certificado acumulado calculado
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            console.log(response.message); // Muestra el mensaje de éxito en la consola
-                        } else {
-                            alert(response.message); // Muestra el mensaje de error
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error en la solicitud AJAX:", error);
-                    }
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                }
+            });
 
             }).fail(function() {
                 alert("Error al cargar los datos de certificados");
@@ -555,9 +573,12 @@
             detalle1: $('textarea[name="detalle1"]').val(),
             notadinero: $('input[name="notadinero"]').val(),
             id_certificado: $('input[name="id_certificado"]').val(),
-            idCentro: $('select[name="idCentritos"]').val() || null
+            idCentro: $('select[name="idCentro"]').val() || null,
+            forzarPIMInicial: $('input[name="forzarPIMInicial"]').val()
+
         };
         $.ajax({
+            
             url: url,
             type: "POST",
             data: formData,
@@ -580,6 +601,9 @@
                         confirmButtonText: "Aceptar"
                     });
                 }
+                console.log("Formulario:", formData);
+                console.log("forzarPIMInicial =", $('input[name="forzarPIMInicial"]').val());
+
             },
             error: function(xhr, status, error) {
                 Swal.fire({
@@ -589,6 +613,7 @@
                     confirmButtonText: "Aceptar"
                 });
             }
+            
         });
     });
 </script>
@@ -635,7 +660,7 @@
             $('textarea[name="detalle1"]').val(detalle || ''); // Llena el detalle
             $('input[name="notadinero"]').val(modificacion || ''); // Llena el monto de modificación
             $('input[name="id_certificado"]').val(idCertificado); // Llena el ID del certificado
-            $('select[name="idCentritos"]').val(idCentro).selectpicker('refresh');
+            $('select[name="idCentro"]').val(idCentro).selectpicker('refresh');
 
         } else {
             // Modo de edición para Certificado
@@ -651,4 +676,60 @@
 
         }
     }
+
+    $('#tipoIngresoPIA').on('change', function () {
+  const tipo = $(this).val();
+  $('#grupoInputPIA').toggle(tipo === 'directo');
+});
+
+$('#guardarPIAOpcion').click(function () {
+  const tipo = $('#tipoIngresoPIA').val();
+  const idDetalle = $('#inputDetalle').val();
+
+  if (tipo === 'directo') {
+    const valorPIA = $('#inputPIA').val();
+    if (!valorPIA) {
+      alert('Debe ingresar un valor para el PIA');
+      return;
+    }
+
+    $.post("<?= base_url('SegCarpetas/actualizarPIA') ?>", {
+      id_detalle: idDetalle,
+      pia: valorPIA
+    }, function () {
+      $('#piaModal').modal('hide');
+      $('#contenidoPantalla').show();
+    });
+
+  } else if (tipo === 'nota') {
+    const idCategoria = $('#categoriaPIA').val();
+    const idPrograma = $('#programaPIA').val();
+    const idFuente = $('#fuentePIA').val();
+    const idMeta = $('#metaPIA').val();
+    const idClasificador = $('#clasificadorPIA').val();
+
+    // Enviar PIA null (opcional, también puede omitirse)
+    $.post("<?= base_url('SegCarpetas/actualizarPIA') ?>", {
+      id_detalle: idDetalle,
+      pia: null
+    }, function () {
+      $('#piaModal').modal('hide');
+
+      // Asignar valores al modal de nota
+      const formNota = $('#form_nota_modificatoria');
+      formNota.find('input[name="id_categoria"]').val(idCategoria);
+      formNota.find('input[name="id_programa"]').val(idPrograma);
+      formNota.find('input[name="id_fuente"]').val(idFuente);
+      formNota.find('input[name="id_meta"]').val(idMeta);
+      formNota.find('input[name="id_clasificador"]').val(idClasificador);
+      formNota.find('input[name="forzarPIMInicial"]').val("1");
+
+      $('#formnota').modal('show');
+    });
+
+  } else {
+    alert('Seleccione una opción válida');
+  }
+});
+
 </script>

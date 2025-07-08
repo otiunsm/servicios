@@ -72,6 +72,21 @@
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
                                             <i class="fas fa-folder fa-3x text-warning"></i>
+                                                 <!-- Íconos en la esquina superior derecha -->
+        <div class="icon-actions">
+       
+            <a href="javascript:void(0);" class="text-warning btn-editar-carpeta" 
+               data-id="<?= $carpeta['id_carpeta'] ?>" 
+               data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>" 
+               data-toggle="modal" data-target="#modalEditarFuente_<?= $carpeta['id_carpeta'] ?>"
+               data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
+               <i class="fas fa-edit"></i>
+            </a>
+  <a href="javascript:void(0);" class="text-danger btn-confirmar-eliminar-fuente" 
+     data-id="<?= $carpeta['id_carpeta'] ?>">
+     <i class="fas fa-trash-alt"></i>
+  </a>
+        </div>
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
@@ -84,19 +99,36 @@
                                                 <i class="fas fa-eye"></i>Ver Metas
                                             </a>
 
-                                            <div class="btn-group mt-2">
-                                                <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditarFuente_<?= $carpeta['id_carpeta'] ?>">
-                                                    <i class="fas fa-edit"></i> Editar
-                                                </button>
-                                                <button class="btn btn-danger btn-sm btn-confirmar-eliminar-fuente" data-id="<?= $carpeta['id_carpeta'] ?>">
-                                                    <i class="fas fa-trash"></i> Eliminar
-                                                </button>
-                                            </div>
-
-
-
                                         </div>
                                     </div>
+                                </div>
+                                <div class="modal fade" id="modalEditarFuente_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
+
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                    <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaFuente') ?>">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title">Editar Fuente</h5>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+                                        <div class="modal-body">
+                                        <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
+                                        <div class="form-group">
+                                            <label>Nombre de la carpeta</label>
+                                            <input type="text" class="form-control" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Descripción</label>
+                                            <textarea class="form-control" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
+                                        </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -160,33 +192,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalEditarFuente_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaFuente') ?>">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Fuente</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
-          <div class="form-group">
-            <label>Nombre de la carpeta</label>
-            <input type="text" class="form-control" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
-          </div>
-          <div class="form-group">
-            <label>Descripción</label>
-            <textarea class="form-control" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Guardar cambios</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
 
 
 <style>
@@ -241,6 +247,25 @@
         background-color: #0056b3;
         border-color: #004085;
     }
+     .icon-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.icon-actions a {
+    margin-left: 8px;
+    font-size: 16px;
+    text-decoration: none;
+}
+.icon-actions i.fa-edit {
+    color:rgb(58, 53, 204); /* naranja */
+}
+
+.icon-actions i.fa-trash-alt {
+    color: #d9534f; /* rojo */
+}
+
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

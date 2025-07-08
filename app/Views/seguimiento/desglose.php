@@ -68,18 +68,24 @@
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
                                             <i class="fas fa-folder fa-3x text-warning"></i>
+                                                    <div class="icon-actions">
+<a href="#" class="text-warning btn-editar-carpeta" data-toggle="modal"
+   data-target="#modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>">
+   <i class="fas fa-edit"></i>
+</a>
+<a href="javascript:void(0);" class="text-danger btn-confirmar-eliminar"
+   onclick="eliminarDesglose('<?= $desglose['id_categoria'] ?>', '<?= $desglose['id_programa'] ?>', '<?= $desglose['id_fuente'] ?>', '<?= $desglose['id_meta'] ?>', '<?= $desglose['id_centro_costos'] ?>')">
+   <i class="fas fa-trash-alt"></i>
+</a>
+
+        </div>
+        
                                             <h5 class="card-title mt-2"><?= $desglose['nombre_desglose'] ?></h5>
                                         </div>
                                         <div class="card-body">
-<button class="btn btn-warning btn-sm"
-        data-toggle="modal"
-        data-target="#modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>">
-  <i class="fas fa-edit"></i> Editar
-</button>
+                                            
 
-<button class="btn btn-danger btn-sm btn-confirmar-eliminar-fuente" >
-  <i class="fas fa-trash"></i> Eliminar
-</button>
+                                            
 
                                             <p class="card-text">
                                                 <strong>Categoria:</strong> <?= $desglose['nombre_categoria'] ?> <br>
@@ -93,7 +99,51 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="modal fade"
+     id="modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>"
+     tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="POST" action="<?= base_url('SegDesglose/editarDesglose') ?>">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Desglose</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id_categoria" value="<?= $desglose['id_categoria'] ?>">
+          <input type="hidden" name="id_programa" value="<?= $desglose['id_programa'] ?>">
+          <input type="hidden" name="id_fuente" value="<?= $desglose['id_fuente'] ?>">
+          <input type="hidden" name="id_meta" value="<?= $desglose['id_meta'] ?>">
+
+          <div class="form-group">
+            <label>Nombre del Desglose</label>
+            <input type="text" class="form-control" name="nombre_desglose"
+                   value="<?= esc($desglose['nombre_desglose']) ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label for="centros_editar">Centros de Costos</label>
+            <select class="selectpicker form-control" name="idCentritos[]" multiple data-live-search="true">
+              <?php foreach ($centrosCostos as $centro): ?>
+                  <option value="<?= $centro['idCentro'] ?>"
+                      <?= $centro['idCentro'] == $desglose['id_centro_costos'] ? 'selected' : '' ?>>
+                      <?= $centro['nombrecen'] ?>
+                  </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
                             <?php endforeach; ?>
+                            
                         <?php else: ?>
                             <div class="col-12">
                                 <p class="text-center">No hay desgloses registrados.</p>
@@ -177,37 +227,8 @@
     </div>
 </div>
 
-<div class="modal fade"
-     id="modalEditar_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>"
-     tabindex="-1" role="dialog">
+<!-- Modal Editar (DENTRO del foreach) -->
 
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form method="post" action="<?= base_url('SegDesglose/editarDesglose') ?>">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Desglose</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-
-          <?php foreach (['id_categoria','id_programa','id_fuente','id_meta','id_centro_costos'] as $campo): ?>
-            <input type="hidden" name="<?= $campo ?>" value="<?= $desglose[$campo] ?>">
-          <?php endforeach; ?>
-
-          <div class="form-group">
-            <label>Nombre Desglose</label>
-            <input type="text" class="form-control" name="nombre_desglose" value="<?= esc($desglose['nombre_desglose']) ?>" required>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Guardar cambios</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 
 
@@ -262,11 +283,46 @@
     .folder-card .btn-primary:hover {
         background-color: #0056b3;
         border-color: #004085;
+        
     }
+    .icon-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.icon-actions a {
+    margin-left: 8px;
+    font-size: 16px;
+    text-decoration: none;
+}
+.icon-actions i.fa-edit {
+    color:rgb(58, 53, 204); /* naranja */
+}
+
+.icon-actions i.fa-trash-alt {
+    color: #d9534f; /* rojo */
+}
+
+
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+    function eliminarDesglose(cat, prog, fuente, meta, centro) {
+    if (confirm("¿Estás seguro de eliminar este desglose?")) {
+        $.post(BASE_URL + "SegDesglose/eliminarDesglose", {
+            id_categoria: cat,
+            id_programa: prog,
+            id_fuente: fuente,
+            id_meta: meta,
+            id_centro_costos: centro
+        }, function (response) {
+            location.reload();
+        });
+    }
+}
+
 </script>

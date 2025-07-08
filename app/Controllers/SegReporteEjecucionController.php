@@ -52,12 +52,12 @@ class SegReporteEjecucionController extends Controller
 public function exportarExcel()
 {
     $id_fuente = $this->request->getGet('id_fuente');
-    $nombreFuente = $this->fuenteModel->find($id_fuente)['nombre_fuente'] ?? '---';
+    $nombreFuente = $id_fuente === 'todos' ? 'Todas las fuentes' : ($this->fuenteModel->find($id_fuente)['nombre_fuente'] ?? '---');
     $año = date('Y');
     $centros = $this->centroCostosModel->where('estado', 1)->findAll();
 
-    $detalles = $this->detalleSeguimientoModel
-        ->select("cat.nombre_categoria, prog.nombre_programa, fuente.codigo_fuente, meta.codigo_meta, meta.codigo_actividad, meta.nombre_meta,
+    $detallesQuery = $this->detalleSeguimientoModel
+        ->select("cat.nombre_categoria, prog.nombre_programa, fuente.codigo_fuente, fuente.nombre_fuente, meta.codigo_meta, meta.codigo_actividad, meta.nombre_meta,
                   CONCAT(clasi.codigo_clasificador, ' - ', clasi.nombre_clasificador) AS clasificador,
                   ds.id_detalle, clasi.id_clasificador,
                   cat.id_categoria, prog.id_programa, fuente.id_fuente, meta.id_meta")
@@ -66,10 +66,13 @@ public function exportarExcel()
         ->join('programas_presupuestales prog', 'prog.id_programa = ds.id_programa')
         ->join('fuentes_financiamiento fuente', 'fuente.id_fuente = ds.id_fuente')
         ->join('metas meta', 'meta.id_meta = ds.id_meta')
-        ->join('clasificadores clasi', 'clasi.id_clasificador = ds.id_clasificador')
-        ->where('ds.id_fuente', $id_fuente)
-        ->findAll();
+        ->join('clasificadores clasi', 'clasi.id_clasificador = ds.id_clasificador');
 
+    if ($id_fuente !== 'todos') {
+        $detallesQuery->where('ds.id_fuente', $id_fuente);
+    }
+
+    $detalles = $detallesQuery->findAll();
     $agrupado = [];
 
     foreach ($detalles as $detalle) {
@@ -91,13 +94,34 @@ public function exportarExcel()
         }
 
         foreach ($centros as $c) {
-            $pim = $this->pimInicialModel
-                ->join('certificados', 'certificados.id_certificado = pim_iniciales.id_certificado')
-                ->where('certificados.id_detalle', $detalle['id_detalle'])
-                ->where('pim_iniciales.id_centro_costos', $c['idCentro'])
-                ->select('pim_iniciales.monto_pim')
-                ->get()
-                ->getRowArray()['monto_pim'] ?? 0;
+            $pim = 0;
+
+            $pimInicial = $this->pimInicialModel
+                ->where([
+                    'id_categoria' => $detalle['id_categoria'],
+                    'id_programa' => $detalle['id_programa'],
+                    'id_fuente' => $detalle['id_fuente'],
+                    'id_meta' => $detalle['id_meta'],
+                    'id_clasificador' => $detalle['id_clasificador'],
+                    'id_centro_costos' => $c['idCentro']
+                ])
+                ->select('monto_pim')
+                ->first();
+
+            $pim = floatval($pimInicial['monto_pim'] ?? 0);
+
+            if ($pim == 0) {
+                $inicialModel = new \App\Models\InicializacionModel();
+                $inicial = $inicialModel->where([
+                    'id_categoria' => $detalle['id_categoria'],
+                    'id_programa' => $detalle['id_programa'],
+                    'id_fuente' => $detalle['id_fuente'],
+                    'id_meta' => $detalle['id_meta'],
+                    'id_clasificador' => $detalle['id_clasificador'],
+                    'id_centro_costos' => $c['idCentro']
+                ])->first();
+                $pim = floatval($inicial['valor_pim'] ?? 0);
+            }
 
             $certs = $this->certificadosModel
                 ->where('id_detalle', $detalle['id_detalle'])
@@ -105,8 +129,9 @@ public function exportarExcel()
                 ->orderBy('fecha', 'ASC')
                 ->findAll();
 
-            $PIM = floatval($pim);
-            $Saldo = floatval($pim);
+            $PIM = $pim;
+            $Saldo = $pim;
+
             foreach ($certs as $cert) {
                 $mod = floatval($cert['modificacion'] ?? 0);
                 $mon = floatval($cert['certificacion_monto'] ?? 0);
@@ -124,6 +149,7 @@ public function exportarExcel()
         }
     }
 
+    // 📊 Excel
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setCellValue('A1', "Ejecución Presupuestal - $año");
@@ -131,11 +157,11 @@ public function exportarExcel()
     $sheet->setCellValue('A2', "Fuente de Financiamiento: $nombreFuente");
     $sheet->mergeCells('A2:Z2');
 
-    // Encabezado doble
-    $columnasPrincipales = ['Categoría', 'Programa', 'Código Fuente', 'Código Meta', 'Código Actividad', 'Nombre Actividad', 'Clasificador', 'Total PIM', 'Total Certificación', 'Total Saldo'];
-    $sheet->fromArray($columnasPrincipales, null, 'A4');
+    // 🧾 Encabezados
+    $headers = ['Categoría', 'Programa', 'Código Fuente', 'Código Meta', 'Código Actividad', 'Nombre Actividad', 'Clasificador', 'Total PIM', 'Total Certificación', 'Total Saldo'];
+    $sheet->fromArray($headers, null, 'A4');
 
-    $colIndex = count($columnasPrincipales) + 1;
+    $colIndex = count($headers) + 1;
     foreach ($centros as $c) {
         $colIni = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
         $colFin = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 2);
@@ -147,40 +173,29 @@ public function exportarExcel()
         $colIndex += 3;
     }
 
-    for ($i = 1; $i <= 10; $i++) {
-        $letra = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
-        if ($sheet->getCell($letra . '5')->getValue() === null) {
-            $sheet->setCellValue($letra . '5', '');
-        }
-    }
-
     $headerStyle = $sheet->getStyle("A4:" . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex - 1) . "5");
     $headerStyle->getFont()->setBold(true);
     $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $headerStyle->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
     $headerStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
 
+    // 📄 Cuerpo
     $fila = 6;
     $columnMerge = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    $previousValues = [];
-    $startRows = [];
+    $previous = []; $startRows = [];
 
     foreach ($agrupado as $info) {
         $b = $info['base'];
-        $total_pim = 0;
-        $total_cert = 0;
-        $total_saldo = 0;
-
+        $totPim = $totCert = $totSaldo = 0;
         foreach ($info['centros'] as $v) {
-            $total_pim += $v['pim'];
-            $total_cert += $v['cert'];
-            $total_saldo += $v['saldo'];
+            $totPim += $v['pim'];
+            $totCert += $v['cert'];
+            $totSaldo += $v['saldo'];
         }
 
         $linea = [
             $b['nombre_categoria'], $b['nombre_programa'], $b['codigo_fuente'],
             $b['codigo_meta'], $b['codigo_actividad'], $b['nombre_meta'],
-            $b['clasificador'], $total_pim, $total_cert, $total_saldo
+            $b['clasificador'], $totPim, $totCert, $totSaldo
         ];
 
         foreach ($centros as $c) {
@@ -194,15 +209,15 @@ public function exportarExcel()
 
         foreach ($columnMerge as $i => $col) {
             $val = $linea[$i];
-            if (!isset($previousValues[$col])) {
-                $previousValues[$col] = $val;
+            if (!isset($previous[$col])) {
+                $previous[$col] = $val;
                 $startRows[$col] = $fila;
-            } elseif ($previousValues[$col] !== $val) {
+            } elseif ($previous[$col] !== $val) {
                 if ($fila - 1 > $startRows[$col]) {
                     $sheet->mergeCells("{$col}{$startRows[$col]}:{$col}" . ($fila - 1));
                     $sheet->getStyle("{$col}{$startRows[$col]}:{$col}" . ($fila - 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                 }
-                $previousValues[$col] = $val;
+                $previous[$col] = $val;
                 $startRows[$col] = $fila;
             }
         }
@@ -217,12 +232,13 @@ public function exportarExcel()
         }
     }
 
-    // Autoajuste de ancho
+    // 📐 Ajustar ancho
     $colFinal = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex - 1);
-    for ($col = 1; $col <= $colIndex - 1; $col++) {
-        $sheet->getColumnDimensionByColumn($col)->setAutoSize(true);
+    for ($i = 1; $i <= $colIndex - 1; $i++) {
+        $sheet->getColumnDimensionByColumn($i)->setAutoSize(true);
     }
 
+    // 💾 Exportar
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header("Content-Disposition: attachment;filename=ejecucion_presupuestal_$año.xlsx");
     header('Cache-Control: max-age=0');
@@ -230,6 +246,7 @@ public function exportarExcel()
     $writer->save('php://output');
     exit;
 }
+
 
 public function graficosCentrosCosto()
 {

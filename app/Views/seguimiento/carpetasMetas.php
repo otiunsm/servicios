@@ -79,16 +79,27 @@
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
                                             <i class="fas fa-file-excel fa-3x text-success"></i>
+                                                                                 <!-- Íconos en la esquina superior derecha -->
+        <div class="icon-actions">
+<a href="javascript:void(0);" 
+   class="text-warning btn-editar-carpeta"
+   data-toggle="modal"
+   data-target="#modalEditarMeta_<?= $carpeta['id_carpeta'] ?>"
+   data-id="<?= $carpeta['id_carpeta'] ?>"
+   data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>"
+   data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
+   <i class="fas fa-edit"></i>
+</a>
+<a href="javascript:void(0);" 
+   class="text-danger btn-confirmar-eliminar-meta"
+   data-id="<?= $carpeta['id_carpeta'] ?>">
+   <i class="fas fa-trash-alt"></i>
+</a>
+        </div>
                                             <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
 
-                                            <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditarMeta_<?= $carpeta['id_carpeta'] ?>">
-                                            <i class="fas fa-edit"></i> Editar
-                                            </button>
-                                            <button class="btn btn-danger btn-sm btn-confirmar-eliminar-meta" data-id="<?= $carpeta['id_carpeta'] ?>">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                            </button>
                                             <p class="card-text">
                                                 <strong>Programa:</strong> <?= esc($carpeta['nombre_programa']) ?><br>
                                                 <strong>Fuente:</strong> <?= esc($carpeta['nombre_fuente']) ?><br>
@@ -111,9 +122,13 @@
                                     </div>
                                 </div>
                                 <!-- Modal para editar meta -->
+
+<!-- Modal para editar meta -->
 <div class="modal fade" id="modalEditarMeta_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
+      
+      <!-- Formulario para editar nombre y descripción de la carpeta -->
       <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaMeta') ?>">
         <div class="modal-header">
           <h5 class="modal-title">Editar Meta</h5>
@@ -135,6 +150,42 @@
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
         </div>
       </form>
+
+      <!-- SEPARADO: Formulario para agregar clasificadores -->
+      <form class="form-agregar-clasificadores" method="post">
+        <hr>
+        <h6>Agregar clasificadores a esta meta</h6>
+
+        <input type="hidden" name="id_categoria" value="<?= $id_categoria ?>">
+        <input type="hidden" name="id_programa" value="<?= $id_programa ?>">
+        <input type="hidden" name="id_fuente" value="<?= $id_fuente ?>">
+        <input type="hidden" name="id_meta" value="<?= $carpeta['id_meta'] ?>">
+
+        <div class="form-group">
+          <label>Nuevos Clasificadores</label>
+          <select class="form-control selectpicker" name="clasificadores[]" multiple data-live-search="true">
+            <?php foreach ($clasificadores as $clasificador): ?>
+              <?php
+                $yaAsignado = false;
+                foreach ($carpeta['detalle_clasificadores'] ?? [] as $dc) {
+                  if ($dc['id_clasificador'] == $clasificador['id_clasificador']) {
+                    $yaAsignado = true;
+                    break;
+                  }
+                }
+              ?>
+              <option value="<?= $clasificador['id_clasificador'] ?>" <?= $yaAsignado ? 'disabled' : '' ?>>
+                <?= $clasificador['nombre_clasificador'] ?> <?= $yaAsignado ? '(Ya asignado)' : '' ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success btn-sm">Guardar Nuevos Clasificadores</button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
@@ -263,6 +314,25 @@
         background-color: #0056b3;
         border-color: #004085;
     }
+     .icon-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.icon-actions a {
+    margin-left: 8px;
+    font-size: 16px;
+    text-decoration: none;
+}
+.icon-actions i.fa-edit {
+    color:rgb(58, 53, 204); /* naranja */
+}
+
+.icon-actions i.fa-trash-alt {
+    color: #d9534f; /* rojo */
+}
+
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -303,4 +373,32 @@
     });
   });
 });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.form-agregar-clasificadores').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch("<?= base_url('SegCarpetas/agregarClasificadoresAMeta') ?>", {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Éxito', `${data.insertados} clasificadores agregados.`, 'success')
+              .then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.errores.join("\n"), 'error');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire('Error', 'No se pudo guardar los clasificadores', 'error');
+        });
+      });
+    });
+  });
 </script>

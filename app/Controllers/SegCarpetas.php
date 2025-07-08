@@ -52,15 +52,28 @@ class SegCarpetas extends Controller
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, redirigir con errores
+             session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo crear esta carpet."]);// Si la validación falla, redirigir con errores
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        
         // Datos del formulario
         $nombreCarpeta = $this->request->getPost('nombre_carpeta');
         $idCategoria = $this->request->getPost('id_categoria');
         $idPrograma = $this->request->getPost('id_programa');
         $descripcion = $this->request->getPost('descripcion');
+
+
+        $yaExiste = $this->carpetaModel
+            ->where('nombre_carpeta', $nombreCarpeta)
+            ->where('id_categoria', $idCategoria)
+            ->where('id_programa', $idPrograma)
+            ->where('id_carpeta_padre', null)
+            ->first();
+
+        if ($yaExiste) {
+            return redirect()->back()->withInput()->with('error', 'Ya existe una carpeta de programa con el mismo nombre, categoría y programa.');
+        }
 
         // Insertar la carpeta de programa
         $dataCarpeta = [
@@ -115,7 +128,11 @@ class SegCarpetas extends Controller
 
         if ($existeCarpeta) {
             // Si ya existe una carpeta con el mismo nombre y id_fuente, redirigir con un mensaje de error
-            return redirect()->back()->withInput()->with('error', 'Ya existe una carpeta fuente con el mismo nombre y fuente de financiamiento.');
+            
+
+                session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo crear esta carpeta."]);
+                return redirect()->to(base_url() . "/SegCarpetas");
+
         }
 
         // Crear carpeta de fuente
@@ -156,7 +173,7 @@ class SegCarpetas extends Controller
         $carpetaPadre = $this->carpetaModel->find($idCarpetaPadre);
 
         if (!$carpetaPadre) {
-            // Si no se encuentra la carpeta padre, redirigir con un mensaje de error
+             session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo crear esta carpeta."]);// Si no se encuentra la carpeta padre, redirigir con un mensaje de error
             return redirect()->back()->with('error', 'La carpeta padre no existe.');
         }
         // Datos del formulario
@@ -166,6 +183,20 @@ class SegCarpetas extends Controller
         $idCategoria = $this->request->getPost('id_categoria');
         $idPrograma = $this->request->getPost('id_programa');
         $idFuente = $this->request->getPost('id_fuente');
+
+
+        $yaExiste = $this->carpetaModel
+            ->where([
+                'id_categoria' => $carpetaPadre['id_categoria'],
+                'id_programa' => $carpetaPadre['id_programa'],
+                'id_fuente' => $carpetaPadre['id_fuente'],
+                'id_meta' => $idMeta
+            ])
+            ->first();
+
+        if ($yaExiste) {
+            return redirect()->back()->withInput()->with('error', 'Ya existe una carpeta meta para esta combinación.');
+        }
 
 
 
@@ -195,6 +226,7 @@ class SegCarpetas extends Controller
                 'certificado_acumulado' => 0.00,
                 'estado' => 1,
             ];
+
             $this->detalleSeguimientoModel->insert($dataDetalle);
         }
 
@@ -282,19 +314,32 @@ class SegCarpetas extends Controller
         // Obtener los nombres de categoría, programa, fuente y metas para mostrarlos en la vista
         $metas = $this->metaModel->findAll();
         $clasificadores = $this->clasificadoresModel->where('estado', 1)->findAll();
-        foreach ($carpetas as &$carpeta) {
-            // Obtener el nombre del programa
-            $programa = $this->programaModel->find($carpeta['id_programa']);
-            $carpeta['nombre_programa'] = $programa ? $programa['nombre_programa'] : 'Sin programa';
+            foreach ($carpetas as &$carpeta) {
+                // Obtener el nombre del programa
+                $programa = $this->programaModel->find($carpeta['id_programa']);
+                $carpeta['nombre_programa'] = $programa ? $programa['nombre_programa'] : 'Sin programa';
 
-            // Obtener el nombre de la fuente
-            $fuente = $this->fuenteModel->find($carpeta['id_fuente']);
-            $carpeta['nombre_fuente'] = $fuente ? $fuente['nombre_fuente'] : 'Sin fuente';
+                // Obtener el nombre de la fuente
+                $fuente = $this->fuenteModel->find($carpeta['id_fuente']);
+                $carpeta['nombre_fuente'] = $fuente ? $fuente['nombre_fuente'] : 'Sin fuente';
 
-            // Obtener el nombre de la meta
-            $meta = $this->metaModel->find($carpeta['id_meta']);
-            $carpeta['nombre_meta'] = $meta ? $meta['nombre_meta'] : 'Sin meta';
-        }
+                // Obtener el nombre de la meta
+                $meta = $this->metaModel->find($carpeta['id_meta']);
+                $carpeta['nombre_meta'] = $meta ? $meta['nombre_meta'] : 'Sin meta';
+
+                // Obtener los clasificadores ya asignados a esta carpeta/meta
+                $detalleClasificadores = $this->detalleSeguimientoModel
+                    ->where([
+                        'id_categoria' => $idCategoria,
+                        'id_programa' => $carpeta['id_programa'],
+                        'id_fuente' => $carpeta['id_fuente'],
+                        'id_meta' => $carpeta['id_meta']
+                    ])
+                    ->findAll();
+
+                $carpeta['detalle_clasificadores'] = $detalleClasificadores;
+            }
+
 
         // Pasar los datos a la vista usando viewData
         $data = [
@@ -422,20 +467,24 @@ class SegCarpetas extends Controller
 
 
 
-    public function actualizarPIA()
-    {
-        $idDetalle = $this->request->getPost('id_detalle');
-        $pia = $this->request->getPost('pia');
+public function actualizarPIA()
+{
+    $idDetalle = $this->request->getPost('id_detalle');
+    $pia = $this->request->getPost('pia');
 
-        // Actualiza el campo PIA para el registro de id_detalle específico
-        $this->detalleSeguimientoModel->update($idDetalle, [
-            'PIA' => $pia,
-            'PIM' => $pia // Actualizamos también el PIM con el mismo valor que el PIA
-        ]);
+    // Si se recibe un PIA vacío, lo establecemos como NULL explícitamente
+    $pia = ($pia === null || $pia === '') ? null : $pia;
 
-        // Redirige o realiza otra acción en lugar de devolver JSON
-        return redirect()->back()->with('success', 'PIA actualizado exitosamente');
-    }
+    $data = [
+        'PIA' => $pia,
+        'PIM' => $pia // Si es null, PIM también será null
+    ];
+
+    $this->detalleSeguimientoModel->update($idDetalle, $data);
+
+    return $this->response->setJSON(['success' => true]);
+}
+
 
     public function guardarAcumulados()
     {
@@ -484,21 +533,25 @@ class SegCarpetas extends Controller
             $idCentro = $this->request->getPost('idCentro');
 
             // Verifica los datos requeridos
-            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador || !$idCentro ) {
+            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador  ) {
                 return $this->response->setJSON(['success' => false, 'message' => 'Faltan datos.']);
             }
 
                     // Validar que exista una Nota Modificatoria registrada en pim_iniciales
-                    $existeNota = $this->SegPimInicialmodel
-                        ->where('id_centro_costos', $idCentro)
-                        ->countAllResults();
+// Solo validar si se ha seleccionado un centro de costo
+if (!empty($idCentro)) {
+    $existeNota = $this->SegPimInicialmodel
+        ->where('id_centro_costos', $idCentro)
+        ->countAllResults();
 
-                    if ($existeNota == 0) {
-                        return $this->response->setJSON([
-                            'success' => false,
-                            'message' => 'No se puede registrar un certificado para este centro de costo porque aún no tiene una Nota Modificatoria registrada.'
-                        ]);
-                    }
+    if ($existeNota == 0) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'No se puede registrar un certificado para este centro de costo porque aún no tiene una Nota Modificatoria registrada.'
+        ]);
+    }
+}
+
 
             // Busca el detalle correspondiente
             $detalle = $this->detalleSeguimientoModel->where([
@@ -569,117 +622,194 @@ class SegCarpetas extends Controller
         return $this->response->setJSON($certificados);
     }
 
-    public function guardarNotaModificatoria()
-    {
-        if ($this->request->isAJAX()) {
-            $idCategoria = $this->request->getPost('id_categoria');
-            $idPrograma = $this->request->getPost('id_programa');
-            $idFuente = $this->request->getPost('id_fuente');
-            $idMeta = $this->request->getPost('id_meta');
-            $idClasificador = $this->request->getPost('id_clasificador');
-            $idCentro = $this->request->getPost('idCentro');
+public function guardarNotaModificatoria()
+{
+    if ($this->request->isAJAX()) {
+        $idCategoria = $this->request->getPost('id_categoria');
+        $idPrograma = $this->request->getPost('id_programa');
+        $idFuente = $this->request->getPost('id_fuente');
+        $idMeta = $this->request->getPost('id_meta');
+        $idClasificador = $this->request->getPost('id_clasificador');
+        $idCentro = $this->request->getPost('idCentro');
+        $forzarPIMInicial = $this->request->getPost('forzarPIMInicial');
+        $montoModificacion = $this->request->getPost('notadinero');
+        $detalleTexto = $this->request->getPost('detalle1');
 
-            if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador || !$idCentro ) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Faltan datos.']);
+        if (!$idCategoria || !$idPrograma || !$idFuente || !$idMeta || !$idClasificador || $montoModificacion === null) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Faltan datos.']);
+        }
+
+        $detalle = $this->detalleSeguimientoModel->where([
+            'id_categoria' => $idCategoria,
+            'id_programa' => $idPrograma,
+            'id_fuente' => $idFuente,
+            'id_meta' => $idMeta,
+            'id_clasificador' => $idClasificador
+        ])->first();
+
+        if (!$detalle) {
+            return $this->response->setJSON(['success' => false, 'message' => 'No se encontró el detalle.']);
+        }
+
+        $data = [
+            'id_detalle' => $detalle['id_detalle'],
+            'codigo_transaccion' => null,
+            'fecha' => date('Y-m-d H:i:s'),
+            'detalle' => $detalleTexto,
+            'modificacion' => $montoModificacion,
+            'certificacion_monto' => 0,
+            'certificacion_rebaja' => 0,
+            'certificacion_ampliacion' => 0,
+            'estado' => true,
+            'id_centro_costos' => $idCentro
+        ];
+
+        if ($this->certificadosModel->crearCertificado($data)) {
+            $idCertificado = $this->certificadosModel->insertID();
+
+            // Verificar si ya tiene PIM inicial registrado
+            $existe = $this->SegPimInicialmodel->existePIMInicial(
+                $idCategoria, $idPrograma, $idFuente, $idMeta, $idClasificador, $idCentro
+            );
+
+            if (!$existe && $forzarPIMInicial === "1") {
+                // Registrar PIM inicial y actualizar detalle
+                $this->SegPimInicialmodel->registrarPIMInicial([
+                    'id_certificado' => $idCertificado,
+                    'id_centro_costos' => $idCentro,
+                    'id_categoria' => $idCategoria,
+                    'id_programa' => $idPrograma,
+                    'id_fuente' => $idFuente,
+                    'id_meta' => $idMeta,
+                    'id_clasificador' => $idClasificador,
+                    'monto_pim' => $montoModificacion
+                ]);
+
+                $this->detalleSeguimientoModel->update($detalle['id_detalle'], [
+                    'PIA' => null,
+                    'PIM' => $montoModificacion
+                ]);
             }
-            $detalle = $this->detalleSeguimientoModel->where([
-                'id_categoria' => $idCategoria,
-                'id_programa' => $idPrograma,
-                'id_fuente' => $idFuente,
-                'id_meta' => $idMeta,
-                'id_clasificador' => $idClasificador
-            ])->first();
-
-            if (!$detalle) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'No se encontró un detalle correspondiente.']);
-            }
-
-            $data = [
-                'id_detalle' => $detalle['id_detalle'],
-                'codigo_transaccion' => null, // No se registra código de transacción para notas
-                'fecha' => date('Y-m-d H:i:s'),
-                'detalle' => $this->request->getPost('detalle1'),
-                'modificacion' => $this->request->getPost('notadinero'),
-                'certificacion_monto' => 0,
-                'certificacion_rebaja' => 0,
-                'certificacion_ampliacion' => 0,
-                'estado' => true,
-                'id_centro_costos' => $idCentro ? $idCentro : null
-            ];
-
-            $montoModificacion = $this->request->getPost('notadinero');
-
-            if($this->certificadosModel->crearCertificado($data)){
-                                $idCertificado = $this->certificadosModel->insertID();
-
-                // Verificar si ya existe un PIM inicial para este centro de costo
-                $existe = $this->SegPimInicialmodel->where('id_centro_costos', $idCentro)->countAllResults();
-
-                if ($existe == 0) {
-                    // Guardar PIM inicial si es la primera vez
-                    $this->SegPimInicialmodel->insert([
-                        'id_certificado' => $idCertificado,
-                        'id_centro_costos' => $idCentro,
-                        'monto_pim' => $montoModificacion
-                    ]);
-                }
 
             return $this->response->setJSON(['success' => true]);
-            }else {
-                return $this->response->setJSON(['success' => false, 'message' => 'Error al guardar en la base de datos.']);}
-                    
         }
 
-
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Método de solicitud no válido.']);
+        return $this->response->setJSON(['success' => false, 'message' => 'Error al guardar la nota modificatoria.']);
     }
 
-    public function eliminarCertificacion()
-    {
-        if ($this->request->isAJAX()) {
-            $idCertificado = $this->request->getPost('id_certificado');
+    return $this->response->setJSON(['success' => false, 'message' => 'Método no válido.']);
+}
 
-            // Cambiar el estado a inactivo o eliminar la certificación
-            if ($this->certificadosModel->delete($idCertificado)) {
-                return $this->response->setJSON(['success' => true, 'message' => 'Certificación eliminada correctamente.']);
-            } else {
-                return $this->response->setJSON(['success' => false, 'message' => 'Error al eliminar la certificación.']);
+
+
+public function eliminarCertificacion()
+{
+    if ($this->request->isAJAX()) {
+        $idCertificado = $this->request->getPost('id_certificado');
+
+        // Verificar si el certificado es PIM inicial
+        $esPIMInicial = $this->SegPimInicialmodel->esCertificadoPIMInicial($idCertificado);
+
+        // Eliminar primero el registro de la tabla pim_iniciales si aplica
+        if ($esPIMInicial) {
+            $this->SegPimInicialmodel
+                ->where('id_certificado', $idCertificado)
+                ->delete();
+        }
+
+        // Eliminar el certificado (de la tabla certificados)
+        if ($this->certificadosModel->delete($idCertificado)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Certificación y datos de PIM inicial eliminados correctamente.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Error al eliminar la certificación.'
+            ]);
+        }
+    }
+
+    return $this->response->setJSON([
+        'success' => false,
+        'message' => 'Método no permitido.'
+    ]);
+}
+
+
+public function editarCertificado()
+{
+    $idCertificado = $this->request->getPost('id_certificado');
+    $nuevoCentro = $this->request->getPost('idCentro');
+    
+    $data = [
+        'codigo_transaccion' => $this->request->getPost('certificado'),
+        'detalle' => $this->request->getPost('detalle'),
+        'certificacion_monto' => ($this->request->getPost('tipo_certificacion') === 'monto') ? $this->request->getPost('dinero') : 0,
+        'certificacion_rebaja' => ($this->request->getPost('tipo_certificacion') === 'rebaja') ? $this->request->getPost('dinero') : 0,
+        'certificacion_ampliacion' => ($this->request->getPost('tipo_certificacion') === 'ampliacion') ? $this->request->getPost('dinero') : 0,
+        'id_centro_costos' => $nuevoCentro ?? null
+    ];
+
+    if ($this->certificadosModel->update($idCertificado, $data)) {
+
+        // Si este certificado es también PIM inicial, actualizar en pim_iniciales
+        if ($this->SegPimInicialmodel->esCertificadoPIMInicial($idCertificado)) {
+            $nuevoMonto = $data['certificacion_monto'] + $data['certificacion_ampliacion'] - $data['certificacion_rebaja'];
+            $this->SegPimInicialmodel->actualizarMontoPorCertificado($idCertificado, $nuevoMonto);
+
+            // Actualiza también el PIM en la tabla detalle_seguimiento
+            $certificado = $this->certificadosModel->find($idCertificado);
+            if ($certificado && isset($certificado['id_detalle'])) {
+                $this->detalleSeguimientoModel->update($certificado['id_detalle'], [
+                    'PIM' => $nuevoMonto
+                ]);
             }
         }
-        return $this->response->setJSON(['success' => false, 'message' => 'Método no permitido.']);
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Certificado actualizado con éxito.']);
+    } else {
+        return $this->response->setJSON(['success' => false, 'message' => 'Error al actualizar el certificado.']);
     }
+}
 
-    public function editarCertificado()
-    {
-        $idCertificado = $this->request->getPost('id_certificado');
-        $data = [
-            'codigo_transaccion' => $this->request->getPost('certificado'),
-            'detalle' => $this->request->getPost('detalle'),
-            'certificacion_monto' => ($this->request->getPost('tipo_certificacion') === 'monto') ? $this->request->getPost('dinero') : 0,
-            'certificacion_rebaja' => ($this->request->getPost('tipo_certificacion') === 'rebaja') ? $this->request->getPost('dinero') : 0,
-            'certificacion_ampliacion' => ($this->request->getPost('tipo_certificacion') === 'ampliacion') ? $this->request->getPost('dinero') : 0
-        ];
+public function editarNotaModificatoria()
+{
+    $idCertificado = $this->request->getPost('id_certificado');
+    $nuevoMonto = $this->request->getPost('notadinero');
+    $detalle = $this->request->getPost('detalle1');
+    $nuevoCentro = $this->request->getPost('idCentro'); // <-- Agregado
 
-        if ($this->certificadosModel->update($idCertificado, $data)) {
-            return $this->response->setJSON(['success' => true, 'message' => 'Certificado actualizado con éxito.']);
-        } else {
-            return $this->response->setJSON(['success' => false, 'message' => 'Error al actualizar el certificado.']);
+    $data = [
+        'detalle' => $detalle,
+        'modificacion' => $nuevoMonto,
+        'id_centro_costos' => $nuevoCentro // <-- Agregado
+    ];
+
+    if ($this->certificadosModel->update($idCertificado, $data)) {
+        // Si este certificado es el registrado como PIM inicial, actualiza también el monto
+        if ($this->SegPimInicialmodel->esCertificadoPIMInicial($idCertificado)) {
+            $this->SegPimInicialmodel->actualizarMontoPorCertificado($idCertificado, $nuevoMonto);
+
+            // Además actualiza el valor en detalle_seguimiento
+            $certificado = $this->certificadosModel->find($idCertificado);
+            if ($certificado) {
+                $this->detalleSeguimientoModel->update($certificado['id_detalle'], [
+                    'PIM' => $nuevoMonto
+                ]);
+            }
         }
-    }
-    public function editarNotaModificatoria()
-    {
-        $idCertificado = $this->request->getPost('id_certificado');
-        $data = [
-            'detalle' => $this->request->getPost('detalle1'),
-            'modificacion' => $this->request->getPost('notadinero')
-        ];
 
-        if ($this->certificadosModel->update($idCertificado, $data)) {
-            return $this->response->setJSON(['success' => true, 'message' => 'Nota modificatoria actualizada con éxito.']);
-        } else {
-            return $this->response->setJSON(['success' => false, 'message' => 'Error al actualizar la nota modificatoria.']);
-        }
+        return $this->response->setJSON(['success' => true, 'message' => 'Nota modificatoria actualizada con éxito.']);
     }
+
+    return $this->response->setJSON(['success' => false, 'message' => 'Error al actualizar la nota modificatoria.']);
+}
+
+
+
+
 
     public function buscarCarpetas()
     {
@@ -875,6 +1005,94 @@ public function eliminarCarpetaMeta()
 
     return redirect()->back();
 }
+
+
+// NUEVO MÉTODO PARA AGREGAR CLASIFICADORES A UNA META EXISTENTE
+
+
+public function agregarClasificadoresAMeta()
+{
+    $idCategoria = $this->request->getPost('id_categoria');
+    $idPrograma = $this->request->getPost('id_programa');
+    $idFuente = $this->request->getPost('id_fuente');
+    $idMeta = $this->request->getPost('id_meta');
+    $clasificadores = $this->request->getPost('clasificadores');
+
+    $insertados = 0;
+    $errores = [];
+
+    if (!$clasificadores || !is_array($clasificadores)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'No se han seleccionado clasificadores.'
+        ]);
+    }
+
+    foreach ($clasificadores as $idClasificador) {
+        $yaExiste = $this->detalleSeguimientoModel->where([
+            'id_categoria' => $idCategoria,
+            'id_programa' => $idPrograma,
+            'id_fuente' => $idFuente,
+            'id_meta' => $idMeta,
+            'id_clasificador' => $idClasificador
+        ])->first();
+
+        if ($yaExiste) {
+            $errores[] = "El clasificador $idClasificador ya está asignado.";
+            continue;
+        }
+
+        $insertado = $this->detalleSeguimientoModel->insert([
+            'id_categoria' => $idCategoria,
+            'id_programa' => $idPrograma,
+            'id_fuente' => $idFuente,
+            'id_meta' => $idMeta,
+            'id_clasificador' => $idClasificador,
+            'PIA' => 0.00,
+            'PIM' => 0.00,
+            'PIM_acumulado' => 0.00,
+            'certificado_acumulado' => 0.00,
+            'estado' => 1
+        ]);
+
+        if ($insertado) {
+            $insertados++;
+        } else {
+            $errores[] = "No se pudo agregar clasificador $idClasificador.";
+        }
+    }
+
+    return $this->response->setJSON([
+        'success' => true,
+        'insertados' => $insertados,
+        'errores' => $errores
+    ]);
+}
+
+
+
+// MÉTODO ACTUALIZADO: VALIDAR ELIMINACIÓN DETALLE SOLO SI PIA = 0
+public function eliminarDetalleClasificador()
+{
+    $idDetalle = $this->request->getPost('id_detalle');
+    $detalle = $this->detalleSeguimientoModel->find($idDetalle);
+
+    if (!$detalle) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Detalle no encontrado.']);
+    }
+
+    if ($detalle['PIA'] > 0) {
+        return $this->response->setJSON(['success' => false, 'message' => 'No se puede eliminar: el clasificador tiene PIA mayor a 0.']);
+    }
+
+    if ($this->detalleSeguimientoModel->delete($idDetalle)) {
+        return $this->response->setJSON(['success' => true, 'message' => 'Clasificador eliminado correctamente.']);
+    } else {
+        return $this->response->setJSON(['success' => false, 'message' => 'Error al eliminar el clasificador.']);
+    }
+}
+
+
 
 
 
