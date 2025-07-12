@@ -3,132 +3,122 @@
 <!-- jQuery y DataTables JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!--begin::Content-->
+<!-- Vista controlgastoscentros adaptada -->
+
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
-    <!--begin::Subheader-->
-    <div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
-        <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">
-            <!--begin::Info-->
-            <div class="d-flex align-items-center flex-wrap mr-1">
-                <!--begin::Page Heading-->
-                <div class="d-flex align-items-baseline flex-wrap mr-5">
-                    <!--begin::Page Title-->
-                    <h5 class="text-dark font-weight-bold my-1 mr-5">Control de Gastos</h5>
-                    <!--end::Page Title-->
-                    <!--begin::Breadcrumb-->
-                    <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url() ?>" class="text-muted">Panel de Control</a>
-                        </li>
-                    </ul>
-                    <!--end::Breadcrumb-->
-                </div>
-                <!--end::Page Heading-->
-            </div>
-            <!--end::Info-->
+  <div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
+    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">
+      <div class="d-flex align-items-center flex-wrap mr-1">
+        <div class="d-flex align-items-baseline flex-wrap mr-5">
+          <h5 class="text-dark font-weight-bold my-1 mr-5">Control de Gastos por Centros de Costo</h5>
+          <ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
+            <li class="breadcrumb-item">
+              <a href="<?= base_url() ?>" class="text-muted">Panel de Control</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </div>
-    <!--end::Subheader-->
+  </div>
 
-    <!--begin::Entry-->
-    <div class="d-flex flex-column-fluid">
-        <!--begin::Container-->
-        <div class="container">
-            <!--begin::Card Header-->
-            <div class="card card-custom mb-4">
-                <div class="card-header flex-wrap py-5">
-                    <div class="card-title">
-                        <h3 class="card-label">Clasificadores
-                            <select id="clasificadores" name="clasificadores" class="selectpicker form-control" title="Elige el clasificador...">
-                                <?php foreach ($clasificadores as $clasificador): ?>
-                                    <option value="<?= esc($clasificador['id_clasificador']) ?>"
-                                        data-nombre="<?= esc($clasificador['nombre_clasificador']) ?>">
-                                        <?= esc($clasificador['nombre_clasificador']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-
-                        </h3>
-                    </div>
-                </div>
-            </div>
-            <!--end::Card Header-->
-            <div id="contenidoPantalla" style="display: none;">
-
-                <!--begin::Card Body-->
-                <div class="card card-custom mb-4" id="captura" name="captura">
-                    <div class="card-body">
-                        <!-- Botones de exportación -->
-                        <div class="text-center mb-3">
-                            <button onclick="exportToExcel()" class="btn btn-success">Exportar a Excel</button>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Programa:</h10>
-                                    <input type="text" class="form-control" name="codPrograma" value="<?= esc($programaNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Fuente de Financiamiento:</h10>
-                                    <input type="text" class="form-control" name="codFuente" value="<?= esc($fuenteNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">PIA:</h10>
-                                    <input type="text" class="form-control" name="pia" style="width: 120px;" readonly />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Meta:</h10>
-                                    <input type="text" class="form-control" name="nomMeta" value="<?= esc($metaNombre) ?>" style="width: 250px;" readonly />
-                                </div>
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">PIM - INICIAL:</h10>
-                                <input type="text" class="form-control" name="pim" style="width: 120px;" readonly />
-
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-group d-flex flex-column align-items-center">
-                                    <h10 class="mr-3 mb-0">Proyecto/Actividad:</h10>
-                                    <input type="text" class="form-control" name="clasificadorNombre" style="width: 250px;" readonly />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--begin: Datatable-->
-                        <table class="table table-separate table-head-custom table-checkable" id="kt_datatable">
-                            <thead>
-                                <tr class="text-center">
-                                    <th rowspan="2">N°</th>
-                                    <th rowspan="2">Fecha de<br>Ingreso</th>
-                                    <th rowspan="2">Detalle</th>
-                                    <th rowspan="2">Modificación</th>
-                                    <th rowspan="2">PIM</th>
-                                    <th colspan="3">CERTIFICACIÓN</th>
-                                    <th rowspan="2">Saldo</th>
-                                </tr>
-                                <tr class="text-center">
-                                    <th>Monto</th>
-                                    <th>Rebaja</th>
-                                    <th>Ampliación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                        <!--end: Datatable-->
-                    </div>
-                </div>
-                <!--end::Card Body-->
-            </div>
+  <div class="d-flex flex-column-fluid">
+    <div class="container">
+      <!-- Selector de Clasificadores -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header py-4">
+          <h5 class="mb-0">Seleccionar Clasificador</h5>
         </div>
-        <!--end::Container-->
+        <div class="card-body">
+          <select id="clasificadores" name="clasificadores" class="selectpicker form-control" title="Elige el clasificador...">
+            <?php foreach ($clasificadores as $clasificador): ?>
+              <option value="<?= esc($clasificador['id_clasificador']) ?>" data-nombre="<?= esc($clasificador['nombre_clasificador']) ?>">
+                <?= esc($clasificador['nombre_clasificador']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+
+      <div id="contenidoPantalla" style="display: none;">
+        <!-- Información General -->
+        <div class="card shadow-sm mb-4" id="cardInformacionGeneral">
+          <div class="card-body">
+            <div class="row">
+              <?php
+                $campos = [
+                  ['Programa', 'codPrograma', $programaNombre],
+                  ['Fuente de Financiamiento', 'codFuente', $fuenteNombre],
+                  ['PIA', 'pia', ''],
+                  ['Meta', 'nomMeta', $metaNombre],
+                  ['PIM - INICIAL', 'pim', ''],
+                  ['Proyecto/Actividad', 'clasificadorNombre', '']
+                ];
+                foreach ($campos as [$label, $name, $valor]) {
+              ?>
+                <div class="col-12 col-md-6 col-lg-4 mb-3">
+                  <label class="font-weight-bold text-muted mb-1"><?= $label ?>:</label>
+                  <input type="text" class="form-control text-center text-truncate w-100" name="<?= $name ?>" value="<?= esc($valor) ?>" readonly title="<?= esc($valor) ?>">
+                </div>
+              <?php } ?>
+              <input type="hidden" name="id_categoria" />
+              <input type="hidden" name="id_programa" />
+              <input type="hidden" name="id_fuente" />
+              <input type="hidden" name="id_meta" />
+              <input type="hidden" name="id_clasificador" />
+              <input type="hidden" name="id_centro_costos" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Certificaciones -->
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Detalle de Certificaciones</h5>
+              <button onclick="exportToExcel()" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Exportar a Excel
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover text-center" id="kt_datatable">
+                <thead class="thead-light">
+                  <tr>
+                    <th rowspan="2">N°</th>
+                    <th rowspan="2">Fecha Ingreso</th>
+                    <th rowspan="2">Detalle</th>
+                    <th rowspan="2">Modificación</th>
+                    <th rowspan="2">PIM</th>
+                    <th colspan="3">CERTIFICACIÓN</th>
+                    <th rowspan="2">Saldo</th>
+                  </tr>
+                  <tr>
+                    <th>Monto</th>
+                    <th>Rebaja</th>
+                    <th>Ampliación</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>            
+          </div>
+        </div>
+      </div>
+
     </div>
-    <!--end::Entry-->
+  </div>
 </div>
+
+<style>
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+  }
+  .form-control[readonly] {
+    background-color: #f9f9f9;
+  }
+</style>
+
 
 <script>
     function exportToExcel() {
@@ -222,12 +212,18 @@ if (response.editable) {
     $('input[name="pim"]').prop('readonly', false);
 
     if ($('#btnGuardarInicial').length === 0) {
-        $('#contenidoPantalla .row').first().append(`
-            <div class="col-md-2 mt-4">
-                <button id="btnGuardarInicial" class="btn btn-outline-primary btn-sm">Guardar Inicialización</button>
+    const htmlBotonCentrado = `
+        <div class="row w-100 mt-4">
+            <div class="col-12 text-center">
+                <button id="btnGuardarInicial" class="btn btn-outline-primary btn-sm">
+                    Guardar Inicialización
+                </button>
             </div>
-        `);
-    }
+        </div>
+    `;
+    $('#cardInformacionGeneral .card-body').append(htmlBotonCentrado);
+}
+
 
     $('#btnGuardarInicial').off('click').on('click', function () {
         const valor_pia = $('input[name="pia"]').val();

@@ -75,13 +75,29 @@ class SegCategoria extends Controller
     }
 
     public function eliminar($id)
-    {
-        if ($this->categoriaModel->eliminarCategoria($id)) {
-            return $this->response->setJSON(['Status' => '200', 'Mensaje' => 'Categoria eliminado correctamente.']);
-        } else {
-            return $this->response->setJSON(['Status' => '500', 'Mensaje' => 'Error al eliminar la categoria.']);
-        }
+{
+    // Verificar si la categoría está en uso en carpetas
+    if ($this->categoriaModel->tieneDependencias($id)) {
+        return $this->response->setJSON([
+            'Status' => '409', // Conflicto
+            'Mensaje' => 'No se puede eliminar la categoría porque está siendo utilizada en carpetas.'
+        ]);
     }
+
+    // Si no tiene dependencias, procede a "eliminar" (cambiar estado)
+    if ($this->categoriaModel->eliminarCategoria($id)) {
+        return $this->response->setJSON([
+            'Status' => '200',
+            'Mensaje' => 'Categoría eliminada correctamente.'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'Status' => '500',
+            'Mensaje' => 'Error al eliminar la categoría.'
+        ]);
+    }
+}
+
 
     public function listar_categorias($id)
     {
