@@ -79,24 +79,23 @@
                                     <div class="card folder-card">
                                         <div class="card-header folder-header">
                                             <i class="fas fa-file-excel fa-3x text-success"></i>
-                                                                                 <!-- Íconos en la esquina superior derecha -->
-        <div class="icon-actions">
-<a href="javascript:void(0);" 
-   class="text-warning btn-editar-carpeta"
-   data-toggle="modal"
-   data-target="#modalEditarMeta_<?= $carpeta['id_carpeta'] ?>"
-   data-id="<?= $carpeta['id_carpeta'] ?>"
-   data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>"
-   data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
-   <i class="fas fa-edit"></i>
-</a>
-<a href="javascript:void(0);" 
-   class="text-danger btn-confirmar-eliminar-meta"
-   data-id="<?= $carpeta['id_carpeta'] ?>">
-   <i class="fas fa-trash-alt"></i>
-</a>
-        </div>
-                                            <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
+                                            <div class="icon-actions">
+                                                <a href="javascript:void(0);" 
+                                                class="text-warning btn-editar-carpeta"
+                                                data-toggle="modal"
+                                                data-target="#modalEditarMeta_<?= $carpeta['id_carpeta'] ?>"
+                                                data-id="<?= $carpeta['id_carpeta'] ?>"
+                                                data-nombre="<?= esc($carpeta['nombre_carpeta']) ?>"
+                                                data-descripcion="<?= esc($carpeta['descripcion'] ?? '') ?>">
+                                                <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="javascript:void(0);" 
+                                                class="text-danger btn-confirmar-eliminar-meta"
+                                                data-id="<?= $carpeta['id_carpeta'] ?>">
+                                                <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                                <h5 class="card-title mt-2"><?= esc($carpeta['nombre_carpeta']) ?></h5>
                                         </div>
                                         <div class="card-body">
 
@@ -121,75 +120,76 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Modal para editar meta -->
+                                <div class="modal fade" id="modalEditarMeta_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
 
-<!-- Modal para editar meta -->
-<div class="modal fade" id="modalEditarMeta_<?= $carpeta['id_carpeta'] ?>" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      
-      <!-- Formulario para editar nombre y descripción de la carpeta -->
-      <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaMeta') ?>">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Meta</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
-          <div class="form-group">
-            <label>Nombre Meta</label>
-            <input type="text" class="form-control" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
-          </div>
-          <div class="form-group">
-            <label>Descripción</label>
-            <textarea class="form-control" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Guardar cambios</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
+                                            <!-- Formulario de edición de meta -->
+                                            <form method="post" action="<?= base_url('SegCarpetas/editarCarpetaMeta') ?>">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title">Editar Meta</h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <input type="hidden" name="id_carpeta" value="<?= $carpeta['id_carpeta'] ?>">
+                                                <div class="form-group">
+                                                    <label for="nombre_carpeta">Nombre Meta</label>
+                                                    <input type="text" class="form-control" id="nombre_carpeta" name="nombre_carpeta" value="<?= esc($carpeta['nombre_carpeta']) ?>" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="descripcion">Descripción</label>
+                                                    <textarea class="form-control" id="descripcion" name="descripcion"><?= esc($carpeta['descripcion']) ?></textarea>
+                                                </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                </div>
+                                            </form>
 
-      <!-- SEPARADO: Formulario para agregar clasificadores -->
-      <form class="form-agregar-clasificadores" method="post">
-        <hr>
-        <h6>Agregar clasificadores a esta meta</h6>
+                                            <!-- Separador visual -->
+                                            <hr class="my-2">
 
-        <input type="hidden" name="id_categoria" value="<?= $id_categoria ?>">
-        <input type="hidden" name="id_programa" value="<?= $id_programa ?>">
-        <input type="hidden" name="id_fuente" value="<?= $id_fuente ?>">
-        <input type="hidden" name="id_meta" value="<?= $carpeta['id_meta'] ?>">
+                                            <!-- Formulario para agregar clasificadores -->
+                                            <form class="form-agregar-clasificadores" method="post">
+                                                <div class="px-4 pb-3">
+                                                <h6 class="mb-3">Agregar Clasificadores a esta Meta</h6>
+                                                <input type="hidden" name="id_categoria" value="<?= $id_categoria ?>">
+                                                <input type="hidden" name="id_programa" value="<?= $id_programa ?>">
+                                                <input type="hidden" name="id_fuente" value="<?= $id_fuente ?>">
+                                                <input type="hidden" name="id_meta" value="<?= $carpeta['id_meta'] ?>">
 
-        <div class="form-group">
-          <label>Nuevos Clasificadores</label>
-          <select class="form-control selectpicker" name="clasificadores[]" multiple data-live-search="true">
-            <?php foreach ($clasificadores as $clasificador): ?>
-              <?php
-                $yaAsignado = false;
-                foreach ($carpeta['detalle_clasificadores'] ?? [] as $dc) {
-                  if ($dc['id_clasificador'] == $clasificador['id_clasificador']) {
-                    $yaAsignado = true;
-                    break;
-                  }
-                }
-              ?>
-              <option value="<?= $clasificador['id_clasificador'] ?>" <?= $yaAsignado ? 'disabled' : '' ?>>
-                <?= $clasificador['nombre_clasificador'] ?> <?= $yaAsignado ? '(Ya asignado)' : '' ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </div>
+                                                <div class="form-group">
+                                                    <label for="clasificadores">Selecciona uno o varios clasificadores</label>
+                                                    <select class="form-control selectpicker" id="clasificadores" name="clasificadores[]" multiple data-live-search="true" title="Seleccione clasificadores">
+                                                    <?php foreach ($clasificadores as $clasificador): ?>
+                                                        <?php
+                                                        $yaAsignado = false;
+                                                        foreach ($carpeta['detalle_clasificadores'] ?? [] as $dc) {
+                                                            if ($dc['id_clasificador'] == $clasificador['id_clasificador']) {
+                                                            $yaAsignado = true;
+                                                            break;
+                                                            }
+                                                        }
+                                                        ?>
+                                                        <option value="<?= $clasificador['id_clasificador'] ?>" <?= $yaAsignado ? 'disabled' : '' ?>>
+                                                        <?= $clasificador['nombre_clasificador'] ?> <?= $yaAsignado ? '(Ya asignado)' : '' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                    </select>
+                                                    <small class="form-text text-muted">Los clasificadores ya asignados están deshabilitados</small>
+                                                </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success btn-sm">Guardar Nuevos Clasificadores</button>
-        </div>
-      </form>
-
-    </div>
-  </div>
-</div>
-
+                                                <div class="text-right">
+                                                    <button type="submit" class="btn btn-success">Guardar Nuevos Clasificadores</button>
+                                                </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="col-12">
