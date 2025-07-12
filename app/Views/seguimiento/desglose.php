@@ -127,9 +127,10 @@
             <select class="selectpicker form-control" name="idCentritos[]" multiple data-live-search="true">
               <?php foreach ($centrosCostos as $centro): ?>
                   <option value="<?= $centro['idCentro'] ?>"
-                      <?= $centro['idCentro'] == $desglose['id_centro_costos'] ? 'selected' : '' ?>>
-                      <?= $centro['nombrecen'] ?>
-                  </option>
+    <?= in_array($centro['idCentro'], $desglose['centros_seleccionados']) ? 'selected' : '' ?>>
+    <?= $centro['nombrecen'] ?>
+</option>
+
               <?php endforeach; ?>
             </select>
           </div>

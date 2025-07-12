@@ -44,15 +44,32 @@ class SegDesglose extends Controller
 
     public function index()
     {
+        $desgloses = $this->desgloseModel->getDesgloses();
+        // Agregar los centros de costos seleccionados por cada desglose
+        foreach ($desgloses as &$desglose) {
+            $centros = $this->desgloseModel->obtenerCentrosPorDesglose(
+                $desglose['id_categoria'],
+                $desglose['id_programa'],
+                $desglose['id_fuente'],
+                $desglose['id_meta'],
+                $desglose['nombre_desglose']
+            );
+
+            $desglose['centros_seleccionados'] = array_column($centros, 'id_centro_costos');
+        }
+
         $data = [
-            'desgloses' => $this->desgloseModel->getDesgloses(),
-            'categorias' => $this->desgloseModel->getCategoriasFromCarpetas(),
-            'centrosCostos' => $this->desgloseModel->getCentrosCostos(),
-            'titulo' => 'Control de Gastos por Centro de Costos'
+            'desgloses'      => $desgloses,
+            'categorias'     => $this->desgloseModel->getCategoriasFromCarpetas(),
+            'centrosCostos'  => $this->desgloseModel->getCentrosCostos(),
+            'titulo'         => 'Control de Gastos por Centro de Costos'
         ];
 
-        return $this->viewData("/seguimiento/desglose", $data, ['scripts' => ['js/seg_desglose.js?v=7.1.6']]);
+        return $this->viewData("/seguimiento/desglose", $data, [
+            'scripts' => ['js/seg_desglose.js?v=7.1.6']
+        ]);
     }
+
 
     // Obtener programas por categoría (AJAX)
     public function getProgramas($id_categoria)

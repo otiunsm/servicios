@@ -74,6 +74,19 @@ class SegDesgloseModel extends Model
             ->getResultArray();
     }
 
+    public function obtenerCentrosPorDesglose($id_categoria, $id_programa, $id_fuente, $id_meta, $nombre_desglose)
+    {
+        return $this->where([
+            'id_categoria'     => $id_categoria,
+            'id_programa'      => $id_programa,
+            'id_fuente'        => $id_fuente,
+            'id_meta'          => $id_meta,
+            'nombre_desglose'  => $nombre_desglose,
+            'estado'           => 1
+        ])->findAll();
+    }
+
+
     // Guardar nuevo desglose
     public function guardarDesglose($data)
     {
