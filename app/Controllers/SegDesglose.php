@@ -82,40 +82,71 @@ class SegDesglose extends Controller
     }
 
     // Guardar nuevo desglose
-    public function guardar()
-    {
-        $validation = \Config\Services::validation();
+public function guardar()
+{
+    $validation = \Config\Services::validation();
 
-        $validation->setRules([
-            'nombre_desglose' => 'required|min_length[3]',
-            'id_categoria' => 'required|numeric',
-            'id_programa' => 'required|numeric',
-            'id_fuente' => 'required|numeric',
-            'id_meta' => 'required|numeric',
-            'idCentritos' => 'required'
-        ]);
+    $validation->setRules([
+        'nombre_desglose' => 'required|min_length[3]',
+        'id_categoria'    => 'required|numeric',
+        'id_programa'     => 'required|numeric',
+        'id_fuente'       => 'required|numeric',
+        'id_meta'         => 'required|numeric',
+        'idCentritos'     => 'required'
+    ]);
 
-        if (!$validation->withRequest($this->request)->run()) {
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
-        }
-
-        $centros = $this->request->getPost('idCentritos');
-
-        foreach ($centros as $centro) {
-            $data = [
-                'nombre_desglose' => $this->request->getPost('nombre_desglose'),
-                'id_categoria' => $this->request->getPost('id_categoria'),
-                'id_programa' => $this->request->getPost('id_programa'),
-                'id_fuente' => $this->request->getPost('id_fuente'),
-                'id_meta' => $this->request->getPost('id_meta'),
-                'id_centro_costos' => $centro,
-                'estado' => 1
-            ];
-
-            $this->desgloseModel->guardarDesglose($data);
-        }
-        return redirect()->to(base_url("SegDesglose"))->with('success', 'Desglose creado correctamente.');
+    if (!$validation->withRequest($this->request)->run()) {
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
     }
+
+    $nombre        = $this->request->getPost('nombre_desglose');
+    $id_categoria  = $this->request->getPost('id_categoria');
+    $id_programa   = $this->request->getPost('id_programa');
+    $id_fuente     = $this->request->getPost('id_fuente');
+    $id_meta       = $this->request->getPost('id_meta');
+    $centros       = $this->request->getPost('idCentritos');
+
+    // Validar si alguno de los centros ya tiene un desglose con esta combinación
+    foreach ($centros as $centro) {
+        $existe = $this->desgloseModel->where([
+            'id_categoria'     => $id_categoria,
+            'id_programa'      => $id_programa,
+            'id_fuente'        => $id_fuente,
+            'id_meta'          => $id_meta,
+            'id_centro_costos' => $centro,
+            'estado'           => 1
+        ])->first();
+
+        if ($existe) {
+            session()->setFlashdata('AlertShow', [
+                "Tipo" => 'warning',
+                "Mensaje" => 'Ya existe un desglose para uno o varios de los centros de costos seleccionados.'
+            ]);
+            return redirect()->to(base_url('SegDesglose'));
+        }
+    }
+
+    // Si pasa la validación, guardar todos
+    foreach ($centros as $centro) {
+        $this->desgloseModel->insert([
+            'nombre_desglose'    => $nombre,
+            'id_categoria'       => $id_categoria,
+            'id_programa'        => $id_programa,
+            'id_fuente'          => $id_fuente,
+            'id_meta'            => $id_meta,
+            'id_centro_costos'   => $centro,
+            'estado'             => 1
+        ]);
+    }
+
+    session()->setFlashdata('AlertShow', [
+        "Tipo" => 'success',
+        "Mensaje" => 'Desglose creado correctamente.'
+    ]);
+
+    return redirect()->to(base_url('SegDesglose'));
+}
+
 
     public function listar($idCategoria, $idPrograma, $idFuente, $idMeta)
     {
@@ -475,7 +506,7 @@ public function guardarInicializacion()
             // Agrupar por combinación única
             $agrupados = [];
             foreach ($resultados as $item) {
-                $clave = $item['id_categoria'] . '_' . $item['id_programa'] . '_' . $item['id_fuente'] . '_' . $item['id_meta'];
+                $clave = $item['id_categoria'] . '' . $item['id_programa'] . '' . $item['id_fuente'] . '_' . $item['id_meta'];
                 if (!isset($agrupados[$clave])) {
                     $agrupados[$clave] = $item;
                 }
@@ -571,8 +602,4 @@ public function eliminarDesglose()
 
     return $this->response->setJSON(['success' => true]);
 }
-
-
-
-
 }

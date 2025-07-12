@@ -131,7 +131,7 @@ class SegCarpetas extends Controller
             
 
                 session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo crear esta carpeta."]);
-                return redirect()->to(base_url() . "/SegCarpetas");
+                return redirect()->to(base_url() . "/SegCarpetas/listarFuentes/{$idCarpetaPadre}/{$carpetaPadre['id_categoria']}/{$carpetaPadre['id_programa']}");
 
         }
 
@@ -148,7 +148,7 @@ class SegCarpetas extends Controller
         $this->carpetaModel->insert($dataCarpeta);
 
         // Redirigir a la lista de fuentes con un mensaje de éxito
-        return redirect()->to(base_url("SegCarpetas/listarFuentes/{$carpetaPadre['id_categoria']}/{$carpetaPadre['id_programa']}/{$idCarpetaPadre}"))->with('success', 'Carpeta de fuente creada correctamente.');
+        return redirect()->to(base_url("SegCarpetas/listarFuentes/{$idCarpetaPadre}/{$carpetaPadre['id_categoria']}/{$carpetaPadre['id_programa']}"))->with('success', 'Carpeta de fuente creada correctamente.');
     }
 
     // Método para crear una carpeta de meta
@@ -195,8 +195,10 @@ class SegCarpetas extends Controller
             ->first();
 
         if ($yaExiste) {
-            return redirect()->back()->withInput()->with('error', 'Ya existe una carpeta meta para esta combinación.');
+            session()->setFlashdata('AlertShow', ["Tipo" => 'error', "Mensaje" => "No se pudo crear esta meta."]);
+                return redirect()->to(base_url() . "/SegCarpetas/listarMetas/{$carpetaPadre['id_carpeta']}/{$carpetaPadre['id_categoria']}/{$carpetaPadre['id_programa']}/{$carpetaPadre['id_fuente']}");
         }
+        
 
 
 

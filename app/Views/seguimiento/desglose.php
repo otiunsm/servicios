@@ -65,7 +65,8 @@
                         <?php if (!empty($desgloses)): ?>
                             <?php foreach ($desgloses as $desglose): ?>
                                 <div class="col-md-3 mb-4">
-                                    <div class="card folder-card">
+                                    <div class="card folder-card" id="card_<?= $desglose['id_categoria'] ?>_<?= $desglose['id_programa'] ?>_<?= $desglose['id_fuente'] ?>_<?= $desglose['id_meta'] ?>_<?= $desglose['id_centro_costos'] ?>">
+
                                         <div class="card-header folder-header">
                                             <i class="fas fa-folder fa-3x text-warning"></i>
                                                     <div class="icon-actions">
@@ -309,20 +310,53 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const BASE_URL = "<?= rtrim(base_url(), '/') . '/' ?>";
+
     function eliminarDesglose(cat, prog, fuente, meta, centro) {
-    if (confirm("¿Estás seguro de eliminar este desglose?")) {
-        $.post(BASE_URL + "SegDesglose/eliminarDesglose", {
-            id_categoria: cat,
-            id_programa: prog,
-            id_fuente: fuente,
-            id_meta: meta,
-            id_centro_costos: centro
-        }, function (response) {
-            location.reload();
+        Swal.fire({
+            title: '¿Eliminar desglose?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#e3342f',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post(BASE_URL + "SegDesglose/eliminarDesglose", {
+                    id_categoria: cat,
+                    id_programa: prog,
+                    id_fuente: fuente,
+                    id_meta: meta,
+                    id_centro_costos: centro
+                }, function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Desglose eliminado',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        // Ocultar la tarjeta sin recargar
+                        const cardId = `card_${cat}_${prog}_${fuente}_${meta}_${centro}`;
+                        $("#" + cardId).fadeOut(500, function () {
+                            $(this).remove();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se pudo eliminar',
+                            text: response.message || 'Este desglose tiene registros vinculados.'
+                        });
+                    }
+                });
+            }
         });
     }
-}
-
 </script>

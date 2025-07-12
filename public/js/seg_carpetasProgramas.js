@@ -25,7 +25,7 @@ $buscador.on('keyup', function () {
                     let contenido = '';
 
                     if (tipoVista === 'programa') {
-                        urlVista = `SegCarpetas/listarFuentes/${carpeta.id_categoria}/${carpeta.id_programa}/${carpeta.id_carpeta}`;
+                        urlVista = `SegCarpetas/listarFuentes/${carpeta.id_carpeta}/${carpeta.id_categoria}/${carpeta.id_programa}`;
                         encabezado = `<i class="fas fa-folder fa-3x text-warning"></i>`;
                         contenido= `<p class="card-text"><strong>Programa:</strong> ${carpeta.nombre_programa}</p>
                                     <p class="card-text"><strong>Descripción:</strong> ${carpeta.descripcion ?? 'Sin descripción'}</p>
