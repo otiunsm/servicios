@@ -38,6 +38,14 @@ class SegProgramaPresupuestalModel extends Model
         return $this->update($id, $data);
     }
 
+
+    public function tieneDependencias($id)
+{
+    return $this->db->table('carpetas')
+        ->where('id_programa', $id)
+        ->countAllResults() > 0;
+}
+
     // Eliminar (cambiar estado a inactivo)
     public function eliminarPrograma($id)
     {

@@ -35,6 +35,13 @@ class SegCentrocostosModel extends Model
         return $this->update($id, $data);
     }
 
+    public function tieneDependencias($id)
+    {
+        return $this->db->table('certificados')
+            ->where('id_centro_costos', $id)
+            ->countAllResults() > 0;
+    }
+
     public function eliminarCentroCosto($id)
     {
         return $this->update($id, ['estado' => 0]);

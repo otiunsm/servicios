@@ -74,10 +74,25 @@ class SegProgramas extends Controller
 
     public function eliminar($id)
     {
+        // Verificar si la categoría está en uso en carpetas
+        if ($this->programaModel->tieneDependencias($id)) {
+            return $this->response->setJSON([
+                'Status' => '409', // Conflicto
+                'Mensaje' => 'No se puede eliminar el programa porque está siendo utilizada en carpetas.'
+            ]);
+        }
+
+        // Si no tiene dependencias, procede a "eliminar" (cambiar estado)
         if ($this->programaModel->eliminarPrograma($id)) {
-            return $this->response->setJSON(['Status' => '200', 'Mensaje' => 'Programa eliminado correctamente.']);
+            return $this->response->setJSON([
+                'Status' => '200',
+                'Mensaje' => 'Programa eliminada correctamente.'
+            ]);
         } else {
-            return $this->response->setJSON(['Status' => '500', 'Mensaje' => 'Error al eliminar el programa.']);
+            return $this->response->setJSON([
+                'Status' => '500',
+                'Mensaje' => 'Error al eliminar el programa.'
+            ]);
         }
     }
     

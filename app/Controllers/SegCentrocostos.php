@@ -76,10 +76,25 @@ class SegCentrocostos extends Controller
 
     public function eliminar($id)
     {
+        // Verificar si el clasificador está en uso en detalle_seguimiento
+        if ($this->centroCostosModel->tieneDependencias($id)) {
+            return $this->response->setJSON([
+                'Status' => '409', // Conflicto
+                'Mensaje' => 'No se puede eliminar el centro de costo porque está siendo utilizado.'
+            ]);
+        }
+
+        // Si no tiene dependencias, procede a desactivarlo
         if ($this->centroCostosModel->eliminarCentroCosto($id)) {
-            return $this->response->setJSON(['Status' => '200', 'Mensaje' => 'Centro de costos eliminado correctamente.']);
+            return $this->response->setJSON([
+                'Status' => '200',
+                'Mensaje' => 'Centro de costo eliminado correctamente.'
+            ]);
         } else {
-            return $this->response->setJSON(['Status' => '500', 'Mensaje' => 'Error al eliminar el centro de costos.']);
+            return $this->response->setJSON([
+                'Status' => '500',
+                'Mensaje' => 'Error al eliminar el centro de costo.'
+            ]);
         }
     }
 

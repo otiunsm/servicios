@@ -78,15 +78,30 @@ class SegClasificadores extends Controller
         return $this->clasificadorModel->updateClasificador($id, $data);
     }
 
-    // Desactivar un clasificador (método AJAX)
     public function delete($id)
     {
+        // Verificar si el clasificador está en uso en detalle_seguimiento
+        if ($this->clasificadorModel->tieneDependencias($id)) {
+            return $this->response->setJSON([
+                'Status' => '409', // Conflicto
+                'Mensaje' => 'No se puede eliminar el clasificador porque está siendo utilizado'
+            ]);
+        }
+
+        // Si no tiene dependencias, procede a desactivarlo
         if ($this->clasificadorModel->eliminarClasificador($id)) {
-            return $this->response->setJSON(['Status' => '200', 'Mensaje' => 'Clasificador eliminado correctamente.']);
+            return $this->response->setJSON([
+                'Status' => '200',
+                'Mensaje' => 'Clasificador eliminado correctamente.'
+            ]);
         } else {
-            return $this->response->setJSON(['Status' => '500', 'Mensaje' => 'Error al eliminar el clasificador.']);
+            return $this->response->setJSON([
+                'Status' => '500',
+                'Mensaje' => 'Error al eliminar el clasificador.'
+            ]);
         }
     }
+
 
 
     public function listar_clasificadores($id) {

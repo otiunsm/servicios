@@ -35,6 +35,13 @@ class SegFuenteFinanciamientoModel extends Model
         return $this->update($id, $data);
     }
 
+    public function tieneDependencias($id)
+    {
+        return $this->db->table('carpetas')
+            ->where('id_fuente', $id)
+            ->countAllResults() > 0;
+    }
+
     public function eliminarFuente($id)
     {
         return $this->update($id, ['estado' => 0]);

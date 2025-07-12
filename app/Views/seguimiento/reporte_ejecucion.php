@@ -32,9 +32,8 @@
                         <div class="form-group row">
                             <label for="id_fuente" class="col-form-label col-md-3 text-right">Fuente de Financiamiento:</label>
                             <div class="col-md-6">
-                            <select name="id_fuente" id="id_fuente" class="form-control" required>
-                                <option value="">Seleccione una fuente</option>
-                                <option value="todos">-- Todas las fuentes --</option> <!-- NUEVA OPCIÓN -->
+                            <select class="selectpicker form-control" name="id_fuente" id="id_fuente" data-live-search="true" title="Seleccione una fuente..." required>
+                                <option value="todos">-- Todas las fuentes --</option>
                                 <?php foreach ($fuentes as $fuente): ?>
                                     <option value="<?= $fuente['id_fuente'] ?>">
                                         <?= esc($fuente['nombre_fuente']) ?>

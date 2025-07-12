@@ -39,6 +39,13 @@ class SegClasificadorModel extends Model
         return $this->update($id, $data);
     }
 
+    public function tieneDependencias($id)
+    {
+        return $this->db->table('detalle_seguimiento')
+            ->where('id_clasificador', $id)
+            ->countAllResults() > 0;
+    }
+
     // Eliminar (desactivar) un clasificador
     public function eliminarClasificador($id)
     {

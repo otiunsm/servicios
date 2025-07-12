@@ -36,6 +36,13 @@ class SegMetaModel extends Model
         return $this->update($id, $data);
     }
 
+    public function tieneDependencias($id)
+    {
+        return $this->db->table('carpetas')
+            ->where('id_meta', $id)
+            ->countAllResults() > 0;
+    }
+
     public function eliminarMeta($id)
     {
         return $this->update($id, ['estado' => 0]);

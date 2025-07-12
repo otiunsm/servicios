@@ -65,10 +65,25 @@ class SegFuentes extends Controller
 
     public function eliminar($id)
     {
+        // Verificar si la categoría está en uso en carpetas
+        if ($this->fuenteModel->tieneDependencias($id)) {
+            return $this->response->setJSON([
+                'Status' => '409', // Conflicto
+                'Mensaje' => 'No se puede eliminar la fuente porque está siendo utilizada en carpetas.'
+            ]);
+        }
+
+        // Si no tiene dependencias, procede a "eliminar" (cambiar estado)
         if ($this->fuenteModel->eliminarFuente($id)) {
-            return $this->response->setJSON(['Status' => '200', 'Mensaje' => 'Fuente eliminada correctamente.']);
+            return $this->response->setJSON([
+                'Status' => '200',
+                'Mensaje' => 'Fuente eliminada correctamente.'
+            ]);
         } else {
-            return $this->response->setJSON(['Status' => '500', 'Mensaje' => 'Error al eliminar la fuente.']);
+            return $this->response->setJSON([
+                'Status' => '500',
+                'Mensaje' => 'Error al eliminar la fuente.'
+            ]);
         }
     }
 
